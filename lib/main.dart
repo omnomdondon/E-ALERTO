@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../view/screens/login_screen.dart';
 
 void main() {
   runApp(const MainApp());
@@ -9,12 +12,19 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
-      ),
+    return ScreenUtilInit(
+      designSize: const Size(412, 800),
+      builder: (_, child) {
+        return MaterialApp (
+          color: Colors.white,
+          debugShowCheckedModeBanner: false,
+          title: 'Rawr',
+          initialRoute: '/login',
+          routes: {
+            '/login': (context) => const LoginScreen(),
+          },
+        );
+      },
     );
   }
 }
