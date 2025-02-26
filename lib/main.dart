@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../view/screens/login_screen.dart';
 
@@ -17,6 +18,7 @@ class MainApp extends StatelessWidget {
       builder: (_, child) {
         return MaterialApp (
           color: Colors.white,
+          theme: ThemeData(textTheme: GoogleFonts.workSansTextTheme()),
           debugShowCheckedModeBanner: false,
           title: 'Rawr',
           initialRoute: '/login',

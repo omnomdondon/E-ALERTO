@@ -1,3 +1,4 @@
+import 'package:e_alerto/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -32,7 +33,7 @@ class _LogInScreenState extends State<LoginScreen> {
                   child: Column( // ✅ Wrapping multiple widgets inside a Column
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Image(
+                      const Image(
                         image: AssetImage('../../../assets/images/logos/E-ALERTO_Logo_Colored.png'),
                         width: 267,
                       ),
@@ -42,7 +43,7 @@ class _LogInScreenState extends State<LoginScreen> {
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 24,
-                          fontWeight: FontWeight.w500
+                          fontWeight: FontWeight.bold
                         )
                       ),
                       SizedBox(height: ScreenUtil().setHeight(40)), 
@@ -65,7 +66,27 @@ class _LogInScreenState extends State<LoginScreen> {
                         label: 'Password',
                         hintText: 'Enter Password',
                         isVisible: true, // Hide password input
-                        trailing: Icon(Icons.visibility),
+                        trailing: const Icon(
+                            Icons.visibility_off_outlined,
+                            color: Colors.grey,
+                          ),
+                      ),
+                      Container(
+                        alignment: Alignment.centerRight,
+                        child: 
+                          TextButton(
+                            onPressed: () {},
+                            style: ButtonStyle(
+                               overlayColor: WidgetStateProperty.all(Colors.transparent),
+                            ),
+                            child: 
+                              const Text(
+                                "Forgot password?", 
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                ),
+                              ),
+                          ),
                       ),
                       SizedBox(height: 30), // Add spacing before button
                       CustomFilledButton(
@@ -73,6 +94,25 @@ class _LogInScreenState extends State<LoginScreen> {
                         onPressed: () {},
                         fullWidth: true,
                       ),
+                      SizedBox(height: 30),
+                      Container(
+                        alignment: Alignment.center,
+                        child: RichText(
+                          text: TextSpan(
+                            text: "No account yet? ",
+                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.black),
+                            children: [
+                              TextSpan(
+                                text: "Register here",
+                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                  color: COLOR_PRIMARY,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      )
                     ],
                   ),
                 ),
