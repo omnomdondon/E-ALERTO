@@ -4,15 +4,24 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../widgets/custom_textformfield.dart';
 import '../widgets/custom_filledbutton.dart';
+import '../../controller/input_controller.dart';
+import '../../controller/registration_controller.dart';
 
-class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+class RegistrationScreen extends StatefulWidget {
+  const RegistrationScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  State<RegistrationScreen> createState() => _RegistrationScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _RegistrationScreenState extends State<RegistrationScreen> {
+  final email = TextEditingController();
+  final username = TextEditingController();
+  final password = TextEditingController();
+  final confirmPassword = TextEditingController();
+
+  final inputController = InputController();
+  final formKey = GlobalKey<FormState>();
   
   @override
   Widget build(BuildContext context) {
@@ -51,26 +60,43 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           SizedBox(height: ScreenUtil().setHeight(40)), 
                           const Text("Email", style: TextStyle(color: Colors.black54)),
                           SizedBox(height: ScreenUtil().setHeight(10)),
-                          CustomTextFormField(hintText: 'Enter Email'),
+                          CustomTextFormField(
+                            hintText: 'Enter Email',
+                            controller: email,
+                            inputType: TextInputType.emailAddress,
+                            validator: (value)=> inputController.emailValidator(value)),
+
                           SizedBox(height: ScreenUtil().setHeight(20)),
                           const Text("Username", style: TextStyle(color: Colors.black54)),
                           SizedBox(height: ScreenUtil().setHeight(10)),
-                          CustomTextFormField(hintText: 'Enter username'),
+                          CustomTextFormField(
+                            hintText: 'Enter username',
+                            controller: username,
+                            validator: (value) => inputController.validator(value, "Username is required"),),
                           SizedBox(height: ScreenUtil().setHeight(20)),
                           const Text("Password", style: TextStyle(color: Colors.black54)),
                           SizedBox(height: ScreenUtil().setHeight(10)),
+                          
                           CustomTextFormField(
                             hintText: 'Enter Password',
+                            controller: password,
                             isVisible: true,
-                            trailing: const Icon(Icons.visibility_off_outlined, color: Colors.grey),
+                            
+                            validator: (value)=> inputController.passwordValidator(value)
                           ),
                           SizedBox(height: ScreenUtil().setHeight(20)),
+
                           const Text("Confirm Password", style: TextStyle(color: Colors.black54)),
                           SizedBox(height: ScreenUtil().setHeight(10)),
                           CustomTextFormField(
                             hintText: 'Enter Password',
-                            isVisible: true,
-                            trailing: const Icon(Icons.visibility_off_outlined, color: Colors.grey),
+                            controller: confirmPassword,
+                            isVisible: !inputController.isVisible,
+                            trailing: IconButton(
+                              onPressed: ()=> inputController.showHidePassword(),
+                              icon: Icon(!inputController.isVisible? Icons.visibility_off_outlined : Icons.visibility, color: Colors.grey),
+                            ),
+                            validator: (value)=> inputController.confirmPass(value,password.text)
                           ),
                           SizedBox(height: ScreenUtil().setHeight(20)),
                           Container(
@@ -79,11 +105,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               textAlign: TextAlign.center,
                               text: TextSpan(
                                 text: "By registering, you agree with the ",
-                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.black),
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.black),
                                 children: [
                                   TextSpan(
                                     text: "Privacy and Policies",
-                                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                       color: COLOR_PRIMARY,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -101,20 +127,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           SizedBox(height: 30),
                           Container(
                             alignment: Alignment.center,
-                            child: RichText(
-                              text: TextSpan(
-                                text: "No account yet? ",
-                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.black),
-                                children: [
-                                  TextSpan(
-                                    text: "Register here",
-                                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text('Already have an account? ',
+                                ),
+                                GestureDetector(
+                                  onTap: () => Navigator.popAndPushNamed(
+                                    context, '/login'
+                                  ),
+                                  child: Text(
+                                    'Register here',
+                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                       color: COLOR_PRIMARY,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                ],
-                              ),
+                                )
+                              ],
                             )
                           ),
                         ],

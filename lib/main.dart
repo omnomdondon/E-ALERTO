@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../view/screens/login_screen.dart';
-import '../view/screens/register_screen.dart';
+import 'view/screens/registration_screen.dart';
 
 void main() {
   runApp(const MainApp());
@@ -26,7 +26,7 @@ class MainApp extends StatelessWidget {
           initialRoute: '/register',
           routes: {
             '/login': (context) => const LoginScreen(),
-            '/register': (context) => const RegisterScreen(),
+            '/register': (context) => const RegistrationScreen(),
           },
         );
       },

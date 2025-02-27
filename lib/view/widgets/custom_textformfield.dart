@@ -42,11 +42,24 @@ class CustomTextFormField extends StatefulWidget {
 }
 
 class _CustomTextFormFieldState extends State<CustomTextFormField> {
-  
+  late bool _isObscured;
+
+  @override
+  void initState() {
+    super.initState();
+    _isObscured = widget.isVisible;
+  }
+
+  void _toggleVisibility() {
+    setState(() {
+      _isObscured = !_isObscured;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      validator: widget.validator,
+        validator: widget.validator,
         controller: widget.controller,
         inputFormatters: widget.inputFormat,
         keyboardType: widget.inputType,
@@ -54,13 +67,14 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
         autovalidateMode: AutovalidateMode.onUserInteraction,
 
         // ObscureText | Shows or hides text field's value to users
-        obscureText: widget.isVisible,
+        obscureText: _isObscured,
+
         decoration: InputDecoration(
 
           //label: Text(widget.label),
           hintText: widget.hintText,
           //prefixIcon: Icon(widget.icon),
-          suffixIcon: widget.trailing,
+          //suffixIcon: widget.trailing,
 
           //enabledBorder | Default Text field decoration
           enabledBorder: OutlineInputBorder(
@@ -97,6 +111,13 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
                 width: 2
             ),
           ),
+
+          suffixIcon: widget.isVisible
+            ? IconButton(
+                icon: Icon(_isObscured ? Icons.visibility_off_outlined : Icons.visibility_outlined),
+                onPressed: _toggleVisibility,
+              )
+            : null,
         ),
     );
     throw UnimplementedError();

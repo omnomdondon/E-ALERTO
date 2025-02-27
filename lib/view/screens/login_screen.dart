@@ -66,10 +66,10 @@ class _LogInScreenState extends State<LoginScreen> {
                         label: 'Password',
                         hintText: 'Enter Password',
                         isVisible: true, // Hide password input
-                        trailing: const Icon(
+                        /*trailing: const Icon(
                             Icons.visibility_off_outlined,
                             color: Colors.grey,
-                          ),
+                          ),*/
                       ),
                       Container(
                         alignment: Alignment.centerRight,
@@ -97,22 +97,24 @@ class _LogInScreenState extends State<LoginScreen> {
                       SizedBox(height: 30),
                       Container(
                         alignment: Alignment.center,
-                        child: RichText(
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
-                            text: "No account yet? ",
-                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.black),
-                            children: [
-                              TextSpan(
-                                text: "Register here",
-                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text('No account yet? ',
+                            ),
+                            GestureDetector(
+                              onTap: () => Navigator.popAndPushNamed(
+                                context, '/register'
+                              ),
+                              child: Text(
+                                'Login here',
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                   color: COLOR_PRIMARY,
                                   fontWeight: FontWeight.bold,
                                 ),
-                                //recognizer: GestureDetector()
                               ),
-                            ],
-                          ),
+                            )
+                          ],
                         )
                       )
                     ],
