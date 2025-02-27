@@ -83,7 +83,7 @@ class _LogInScreenState extends State<LoginScreen> {
                               const Text(
                                 "Forgot password?", 
                                 style: TextStyle(
-                                  color: Colors.grey,
+                                  color: Colors.black87,
                                 ),
                               ),
                           ),
@@ -98,6 +98,7 @@ class _LogInScreenState extends State<LoginScreen> {
                       Container(
                         alignment: Alignment.center,
                         child: RichText(
+                          textAlign: TextAlign.center,
                           text: TextSpan(
                             text: "No account yet? ",
                             style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.black),
@@ -108,6 +109,7 @@ class _LogInScreenState extends State<LoginScreen> {
                                   color: COLOR_PRIMARY,
                                   fontWeight: FontWeight.bold,
                                 ),
+                                //recognizer: GestureDetector()
                               ),
                             ],
                           ),

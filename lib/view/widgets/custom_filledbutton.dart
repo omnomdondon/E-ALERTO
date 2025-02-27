@@ -33,8 +33,8 @@ class CustomFilledButton extends StatelessWidget {
     return SizedBox(
       width: fullWidth ? double.infinity : null, // Fills horizontally if true
       height: height, // Uses custom height if provided
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
+      child: FilledButton(
+        style: FilledButton.styleFrom(
           backgroundColor: backgroundColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderRadius),
