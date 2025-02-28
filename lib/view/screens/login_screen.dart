@@ -107,7 +107,7 @@ class _LogInScreenState extends State<LoginScreen> {
                                 context, '/register'
                               ),
                               child: Text(
-                                'Login here',
+                                'Register here',
                                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                   color: COLOR_PRIMARY,
                                   fontWeight: FontWeight.bold,
