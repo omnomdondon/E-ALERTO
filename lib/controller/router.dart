@@ -15,11 +15,11 @@ final router = GoRouter(
   initialLocation: Routes.loginPage,
   routes: [
     GoRoute(
-      path: '/login',
+      path: Routes.loginPage,
       builder: (context, state) => LoginScreen(),
     ),
     GoRoute(
-      path: '/register',
+      path: Routes.registrationPage,
       builder: (context, state) => RegistrationScreen(),
     ),
 

@@ -1,4 +1,5 @@
 import 'package:e_alerto/constants.dart';
+import 'package:e_alerto/controller/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -104,7 +105,7 @@ class _LogInScreenState extends State<LoginScreen> {
                             const Text('No account yet? ',
                             ),
                             GestureDetector(
-                              onTap: () => GoRouter.of(context).go('/register'),
+                              onTap: () => GoRouter.of(context).go(Routes.registrationPage),
                               child: Text(
                                 'Register here',
                                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(

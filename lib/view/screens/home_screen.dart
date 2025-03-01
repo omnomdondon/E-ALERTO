@@ -1,3 +1,4 @@
+import 'package:e_alerto/view/widgets/post_card.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -6,11 +7,21 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(title: const Text('Home'),),
-    body: const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+    backgroundColor: Colors.white,
+    body: Center(
+      child: ListView(
+        //mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('Home Page UwU')
+          PostCard(
+            reportNumber: '1',
+            classification: 'Classification',
+            location: 'Location',
+            status: 'Status', //TODO: Change color depending on status 
+            date: '01/01/2025',
+            username: 'username',
+            upVotes: 0,
+            downVotes: 0,
+          )
         ],
       ),
     ),
