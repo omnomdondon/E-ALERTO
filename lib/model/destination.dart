@@ -23,9 +23,21 @@ const destinations = [
   Destination(
     label: 'search', 
     icon: Icons.search,
-    outlineIcon: Icons.search_outlined,),
+    outlineIcon: Icons.search_outlined,
+  ),
+  Destination(
+    label: 'report', 
+    icon: Icons.add_box,
+    outlineIcon: Icons.add_box_outlined,
+  ),
+  Destination(
+    label: 'notification', 
+    icon: Icons.notifications,
+    outlineIcon: Icons.notifications_outlined,
+  ),
   Destination(
     label: 'profile', 
     icon: Icons.person,
-    outlineIcon: Icons.person_outline,),
+    outlineIcon: Icons.person_outline,
+  ),
 ];

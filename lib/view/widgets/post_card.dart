@@ -151,7 +151,7 @@ class _PostCardState extends State<PostCard> {
                   Text(
                     widget.username,
                     style: TextStyle(
-                      fontSize: ScreenUtil().setSp(12),
+                      fontSize: ScreenUtil().setSp(10),
                       color: Colors.grey.shade600
                     ),
                   ),
@@ -203,8 +203,6 @@ class _PostCardState extends State<PostCard> {
                       iconSize: ScreenUtil().setSp(20)
                     ),
                   )
-                  
-                  
                 ],
               )
             ],

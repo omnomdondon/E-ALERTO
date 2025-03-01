@@ -63,6 +63,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
         controller: widget.controller,
         inputFormatters: widget.inputFormat,
         keyboardType: widget.inputType,
+        style: TextStyle(color: Colors.black87, fontSize: 14),
         //Automatically validates without pressing the button
         autovalidateMode: AutovalidateMode.onUserInteraction,
 
@@ -76,12 +77,14 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
           //prefixIcon: Icon(widget.icon),
           //suffixIcon: widget.trailing,
 
+          
+
           //enabledBorder | Default Text field decoration
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
             borderSide: BorderSide(
-              color: Colors.grey.withOpacity(.3),
-              width: 1.5
+              color: Colors.grey.shade400,
+              width: 1
             ),
           ),
 

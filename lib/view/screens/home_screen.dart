@@ -11,14 +11,13 @@ class HomeScreen extends StatelessWidget {
     backgroundColor: Colors.white,
     body: Center(
       child: ListView(
-        //mainAxisAlignment: MainAxisAlignment.center,
         padding: EdgeInsets.all(ScreenUtil().setSp(15)),
         children: [
           PostCard(
             reportNumber: '1',
             classification: 'Classification',
             location: 'Location',
-            status: 'Submitted', //TODO: Change color depending on status 
+            status: 'Submitted', 
             date: '01/01/2025',
             username: 'username',
             description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
@@ -27,7 +26,7 @@ class HomeScreen extends StatelessWidget {
             reportNumber: '1',
             classification: 'Classification',
             location: 'Location',
-            status: 'Accepted', //TODO: Change color depending on status 
+            status: 'Accepted', 
             date: '01/01/2025',
             username: 'username',
             description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
@@ -36,7 +35,7 @@ class HomeScreen extends StatelessWidget {
             reportNumber: '1',
             classification: 'Classification',
             location: 'Location',
-            status: 'In Progress', //TODO: Change color depending on status 
+            status: 'In Progress', 
             date: '01/01/2025',
             username: 'username',
             description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
@@ -45,7 +44,7 @@ class HomeScreen extends StatelessWidget {
             reportNumber: '1',
             classification: 'Classification',
             location: 'Location',
-            status: 'Resolved', //TODO: Change color depending on status 
+            status: 'Resolved', 
             date: '01/01/2025',
             username: 'username',
             description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
@@ -54,7 +53,7 @@ class HomeScreen extends StatelessWidget {
             reportNumber: '1',
             classification: 'Classification',
             location: 'Location',
-            status: 'Declined', //TODO: Change color depending on status 
+            status: 'Declined',  
             date: '01/01/2025',
             username: 'username',
             description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',

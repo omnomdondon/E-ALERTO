@@ -4,6 +4,7 @@ import 'package:e_alerto/view/screens/home_screen.dart';
 import 'package:e_alerto/view/screens/login_screen.dart';
 import 'package:e_alerto/view/screens/profile_screen.dart';
 import 'package:e_alerto/view/screens/registration_screen.dart';
+import 'package:e_alerto/view/screens/report_screen.dart';
 import 'package:e_alerto/view/screens/search_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -42,6 +43,22 @@ final router = GoRouter(
             GoRoute(
               path: Routes.searchPage,
               builder: (context, state) => const SearchScreen(),
+            )
+          ]
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: Routes.reportPage,
+              builder: (context, state) => ReportScreen(),
+            )
+          ]
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: Routes.notificationPage,
+              builder: (context, state) => const Placeholder(), // replace diz
             )
           ]
         ),
