@@ -11,9 +11,8 @@ class PostCard extends StatefulWidget {
   final String username;
   final String description;
   final String image;
-  final int upVotes;
-  final int downVotes;
-  final int totalVote;
+  int initialUpVotes;
+  int initialDownVotes;
 
   PostCard({
     super.key,
@@ -25,9 +24,8 @@ class PostCard extends StatefulWidget {
     required this.username,
     required this.description,
     this.image = '',
-    required this.upVotes,
-    required this.downVotes,
-    this.totalVote = 0,
+    this.initialUpVotes = 0,
+    this.initialDownVotes = 0,
   });
 
   @override
@@ -35,6 +33,50 @@ class PostCard extends StatefulWidget {
 }
 
 class _PostCardState extends State<PostCard> {
+  int upVotes = 0;
+  int downVotes = 0;
+  int totalVote = 0;
+  int userVote = 0; // 1 for upvote, -1 for downvote, 0 for neutral
+
+  @override
+  void initState() {
+    super.initState();
+    upVotes = widget.initialUpVotes;
+    downVotes = widget.initialDownVotes;
+    totalVote = upVotes - downVotes;
+  }
+
+  void vote(int voteType) {
+    setState(() {
+      if (userVote == voteType) {
+        // If the user clicks the same vote, reset it
+        if (voteType == 1) {
+          upVotes--;
+        } else {
+          downVotes--;
+        }
+        userVote = 0;
+      } else {
+        // Remove previous vote if exists
+        if (userVote == 1) {
+          upVotes--;
+        } else if (userVote == -1) {
+          downVotes--;
+        }
+
+        // Apply new vote
+        if (voteType == 1) {
+          upVotes++;
+        } else {
+          downVotes++;
+        }
+
+        userVote = voteType;
+      }
+      totalVote = upVotes - downVotes;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -67,9 +109,9 @@ class _PostCardState extends State<PostCard> {
                   ElevatedButton(
                     onPressed: () {},
                     style:  ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,// Set background color
-                      minimumSize: const Size(90, 30), // Ensures a minimum width and height
-                      maximumSize: const Size(150, 50),
+                      backgroundColor: getStatusColor(widget.status),// Set background color
+                      minimumSize: Size(ScreenUtil().setWidth(100), ScreenUtil().setHeight(25)), // Ensures a minimum width and height
+                      //maximumSize: const Size(150, 50),
                     ),
                     child: Text(widget.status, 
                       style: TextStyle(
@@ -138,25 +180,27 @@ class _PostCardState extends State<PostCard> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TextButton.icon(
-                    onPressed: () {}, 
-                    icon: Icon(Icons.arrow_upward, size: ScreenUtil().setSp(18)), 
-                    label: Text(widget.totalVote.toString(),
+                    onPressed: () {
+                      vote(1);
+                    }, 
+                    icon: Icon(Icons.arrow_circle_up, size: ScreenUtil().setSp(20), color: userVote == 1 ? COLOR_PRIMARY : Colors.grey.shade400, weight: 20,), 
+                    label: Text(totalVote.toString(),
                       style: TextStyle(
-                        color: Colors.grey.shade400,
+                        color: userVote == 1 || userVote == -1 ? COLOR_PRIMARY : Colors.grey.shade400,
+                        fontWeight: FontWeight.bold,
                         fontSize: ScreenUtil().setSp(12)
                       ),
-                    ),
-                    style: TextButton.styleFrom(
-                      iconColor: Colors.grey.shade400
-                    ),
+                    ),          
                   ),
                   IconButton(
-                    onPressed: () {}, 
-                    icon: const Icon(Icons.arrow_downward), 
+                    onPressed: () {
+                      vote(-1);
+                    }, 
+                    icon: const Icon(Icons.arrow_circle_down, weight: 20,), 
                     
                     style: IconButton.styleFrom(
-                      foregroundColor: Colors.grey.shade400,
-                      iconSize: ScreenUtil().setSp(18)
+                      foregroundColor: userVote == -1 ? COLOR_PRIMARY : Colors.grey.shade400,
+                      iconSize: ScreenUtil().setSp(20)
                     ),
                   )
                   
@@ -168,5 +212,20 @@ class _PostCardState extends State<PostCard> {
         ),
       ),
     );
+  }
+}
+
+Color getStatusColor (String status) {
+  switch (status.toLowerCase()) {
+    case 'submitted':
+      return COLOR_SUBMITTED;
+    case 'accepted':
+      return COLOR_ACCEPTED;
+    case 'in progress':
+      return COLOR_INPROGRESS;
+    case 'resolved':
+      return COLOR_RESOLVED;
+    default:
+      return COLOR_DEFAULT; // Default color if no match
   }
 }

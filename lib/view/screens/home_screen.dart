@@ -18,12 +18,19 @@ class HomeScreen extends StatelessWidget {
             reportNumber: '1',
             classification: 'Classification',
             location: 'Location',
-            status: 'In Progress', //TODO: Change color depending on status 
+            status: 'Submitted', //TODO: Change color depending on status 
             date: '01/01/2025',
             username: 'username',
             description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
-            upVotes: 0,
-            downVotes: 0,
+          ),
+          PostCard(
+            reportNumber: '1',
+            classification: 'Classification',
+            location: 'Location',
+            status: 'Accepted', //TODO: Change color depending on status 
+            date: '01/01/2025',
+            username: 'username',
+            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
           ),
           PostCard(
             reportNumber: '1',
@@ -33,30 +40,24 @@ class HomeScreen extends StatelessWidget {
             date: '01/01/2025',
             username: 'username',
             description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
-            upVotes: 0,
-            downVotes: 0,
           ),
           PostCard(
             reportNumber: '1',
             classification: 'Classification',
             location: 'Location',
-            status: 'In Progress', //TODO: Change color depending on status 
+            status: 'Resolved', //TODO: Change color depending on status 
             date: '01/01/2025',
             username: 'username',
             description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
-            upVotes: 0,
-            downVotes: 0,
           ),
           PostCard(
             reportNumber: '1',
             classification: 'Classification',
             location: 'Location',
-            status: 'In Progress', //TODO: Change color depending on status 
+            status: 'Declined', //TODO: Change color depending on status 
             date: '01/01/2025',
             username: 'username',
             description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
-            upVotes: 0,
-            downVotes: 0,
           )
         ],
       ),
