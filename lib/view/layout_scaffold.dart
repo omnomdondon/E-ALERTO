@@ -19,7 +19,7 @@ class LayoutScaffold extends StatelessWidget {
         selectedIndex: navigationShell.currentIndex,
         onDestinationSelected: navigationShell.goBranch,
         indicatorColor: Colors.transparent,
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         destinations: destinations
             .asMap()
             .entries

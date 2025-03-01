@@ -35,10 +35,10 @@ class _LogInScreenState extends State<LoginScreen> {
                   child: Column( // ✅ Wrapping multiple widgets inside a Column
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Image(
-                        image: AssetImage('../../../assets/images/logos/E-ALERTO_Logo_Colored.png'),
+                      /*const Image(
+                        image: AssetImage('package:e_alerto/assets/images/logos/E-ALERTO_Logo_Colored.png'),
                         width: 267,
-                      ),
+                      ),*/
                       SizedBox(height: ScreenUtil().setHeight(20)),
                       const Text(
                         "Hello, welcome!", 
