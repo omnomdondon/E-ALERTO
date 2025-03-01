@@ -1,6 +1,7 @@
 import 'package:e_alerto/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 
 import '../widgets/custom_textformfield.dart';
 import '../widgets/custom_filledbutton.dart';
@@ -91,7 +92,7 @@ class _LogInScreenState extends State<LoginScreen> {
                       SizedBox(height: 30), // Add spacing before button
                       CustomFilledButton(
                         text: 'Login', 
-                        onPressed: () {},
+                        onPressed: () => GoRouter.of(context).go('/home'),
                         fullWidth: true,
                       ),
                       SizedBox(height: 30),
@@ -103,9 +104,7 @@ class _LogInScreenState extends State<LoginScreen> {
                             const Text('No account yet? ',
                             ),
                             GestureDetector(
-                              onTap: () => Navigator.popAndPushNamed(
-                                context, '/register'
-                              ),
+                              onTap: () => GoRouter.of(context).go('/register'),
                               child: Text(
                                 'Register here',
                                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(

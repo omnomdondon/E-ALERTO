@@ -1,6 +1,7 @@
 import 'package:e_alerto/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 
 import '../widgets/custom_textformfield.dart';
 import '../widgets/custom_filledbutton.dart';
@@ -133,9 +134,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                 const Text('Already have an account? ',
                                 ),
                                 GestureDetector(
-                                  onTap: () => Navigator.popAndPushNamed(
-                                    context, '/login'
-                                  ),
+                                  onTap: () => GoRouter.of(context).go('/login'),
                                   child: Text(
                                     'Login here',
                                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
