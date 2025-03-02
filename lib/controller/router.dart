@@ -2,6 +2,7 @@ import 'package:e_alerto/controller/routes.dart';
 import 'package:e_alerto/view/layout_scaffold.dart';
 import 'package:e_alerto/view/screens/home_screen.dart';
 import 'package:e_alerto/view/screens/login_screen.dart';
+import 'package:e_alerto/view/screens/notification_screen.dart';
 import 'package:e_alerto/view/screens/profile_screen.dart';
 import 'package:e_alerto/view/screens/registration_screen.dart';
 import 'package:e_alerto/view/screens/report_screen.dart';
@@ -58,7 +59,7 @@ final router = GoRouter(
           routes: [
             GoRoute(
               path: Routes.notificationPage,
-              builder: (context, state) => const Placeholder(), // replace diz
+              builder: (context, state) => NotificationScreen(), // replace diz
             )
           ]
         ),

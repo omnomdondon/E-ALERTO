@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 const Color COLOR_PRIMARY = Color.fromARGB(255, 38, 48, 146);
+const Color COLOR_SECONDARY = Color.fromARGB(255, 238, 240, 255);
 
 // Status Colors:
 const Color COLOR_SUBMITTED = Color.fromARGB(255, 223, 29, 28);

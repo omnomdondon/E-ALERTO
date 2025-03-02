@@ -20,7 +20,7 @@ class _LogInScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        child: Container( //TODO: ILAGAY SA LIST VIEW GAYA NG REGISTRATION
+        child: Container( 
           color: Colors.white,
           height: ScreenUtil().screenHeight,
           width: ScreenUtil().screenWidth,

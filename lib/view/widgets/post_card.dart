@@ -84,7 +84,7 @@ class _PostCardState extends State<PostCard> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => Placeholder()
+          builder: (context) => Placeholder() //TODO: DETAIL SCREEN RAAAAAAAAAAAA
         ),
       ),
 
@@ -146,6 +146,7 @@ class _PostCardState extends State<PostCard> {
                   ),
                 ],
               ),
+              
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [

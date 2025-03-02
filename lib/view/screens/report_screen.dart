@@ -132,19 +132,13 @@ class _ReportScreenState extends State<ReportScreen> {
                   style: TextStyle(color: Colors.black54)
                 ),
                 SizedBox(height: ScreenUtil().setHeight(10)),
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(width: 1.5, style: BorderStyle.solid, color: Colors.grey.shade400, ),
-                    borderRadius: BorderRadius.circular(15)
-                  ),
-                  child: const Center(
-                  child: CustomImage(
-                      imageUrl: "assets/placeholder.png",
-                      placeholder: "assets/placeholder.png",
-                      width: double.infinity,
-                      height: 300,
-                      fit: BoxFit.cover,
-                    ),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(20), // ✅ Rounded corners
+                  child: Image.asset(
+                    'assets/placeholder.png',
+                    width: MediaQuery.of(context).size.width, // ✅ Full screen width
+                    height: MediaQuery.of(context).size.height * 0.4, // ✅ 40% of screen height
+                    fit: BoxFit.cover, // ✅ Ensures the image fills the space
                   ),
                 ),
                 SizedBox(height: ScreenUtil().setHeight(20)),
