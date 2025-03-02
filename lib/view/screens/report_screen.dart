@@ -24,7 +24,7 @@ class _ReportScreenState extends State<ReportScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Report'), backgroundColor: Colors.white,),
+    appBar: AppBar(title: const Text('Report'), backgroundColor: Colors.white, surfaceTintColor: Colors.white),
     backgroundColor: Colors.white,
     body: Center(
       child: ListView(
@@ -137,8 +137,8 @@ class _ReportScreenState extends State<ReportScreen> {
                   child: Image.asset(
                     'assets/placeholder.png',
                     width: MediaQuery.of(context).size.width, // ✅ Full screen width
-                    height: MediaQuery.of(context).size.height * 0.4, // ✅ 40% of screen height
-                    fit: BoxFit.cover, // ✅ Ensures the image fills the space
+                    height: MediaQuery.of(context).size.height * 0.3, // ✅ 40% of screen height
+                    fit: BoxFit.contain, // TODO: change to cover
                   ),
                 ),
                 SizedBox(height: ScreenUtil().setHeight(20)),

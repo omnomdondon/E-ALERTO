@@ -18,6 +18,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           appBar: AppBar(
             title: const Text('Notification'),
             backgroundColor: Colors.white,
+            surfaceTintColor: Colors.white,
             bottom: const TabBar( // ✅ Move TabBar to AppBar's bottom
               indicatorColor: COLOR_PRIMARY,
               indicatorSize: TabBarIndicatorSize.tab,
@@ -48,7 +49,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           backgroundColor: Colors.white,
           body: TabBarView( // ✅ Place inside the body
             children: [
-              Column(
+              ListView(
                 children: [
                   NotificationCard(
                     reportNumber: '1',
@@ -62,7 +63,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   ),
                 ],
               ),
-              Column(
+              ListView(
                 children: [
                   NotificationCard(
                     reportNumber: '1',

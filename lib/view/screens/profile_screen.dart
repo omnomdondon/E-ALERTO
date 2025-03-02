@@ -5,7 +5,8 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Profile'),),
+    appBar: AppBar(title: const Text('Profile'), backgroundColor: Colors.white, surfaceTintColor: Colors.white),
+    backgroundColor: Colors.white,
     body: const Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
