@@ -33,7 +33,7 @@ class LayoutScaffold extends StatelessWidget {
                   ),
                   child: Icon(entry.value.outlineIcon ?? entry.value.icon),
                 ),
-                label: entry.value.label,
+                label: "", // entry.value.label,
                 selectedIcon: Icon(
                   entry.value.icon,
                   color: COLOR_PRIMARY, // Selected icon color

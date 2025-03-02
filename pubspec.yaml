@@ -21,3 +21,7 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/placeholder.png
+    - assets/images/
+    - assets/images/logos/E-ALERTO_Logo_Colored.png

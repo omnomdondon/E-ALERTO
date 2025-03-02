@@ -22,8 +22,8 @@ class CustomFilledButton extends StatelessWidget {
     this.backgroundColor = COLOR_PRIMARY,
     this.textColor = Colors.white,
     this.borderRadius = 12.0,
-    this.padding = 16.0,
-    this.fontSize = 16.0,
+    this.padding = 14.0,
+    this.fontSize = 14,
     this.height,
     this.fullWidth = false, // Default is false (normal size)
   });

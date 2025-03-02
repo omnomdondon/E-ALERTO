@@ -1,14 +1,26 @@
+import 'package:e_alerto/constants.dart';
 import 'package:e_alerto/view/widgets/custom_dropdownmenu.dart';
+import 'package:e_alerto/view/widgets/custom_filledbutton.dart';
+import 'package:e_alerto/view/widgets/custom_image.dart';
+import 'package:e_alerto/view/widgets/custom_radiobutton.dart';
+import 'package:e_alerto/view/widgets/custom_textarea.dart';
 import 'package:e_alerto/view/widgets/custom_textformfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class ReportScreen extends StatelessWidget {
+class ReportScreen extends StatefulWidget {
   ReportScreen({super.key});
 
-  // TODO: move to appropriate class
-  final catergory = ['Road', 'Foot Bridge', 'Sidewalk', 'Lamp Post'];
+  @override
+  State<ReportScreen> createState() => _ReportScreenState();
+}
 
+class _ReportScreenState extends State<ReportScreen> {
+  // TODO: move to appropriate class
+  final category = ['Road', 'Foot Bridge', 'Sidewalk', 'Lamp Post'];
+  int selectedRadioValue = 1;
+  String severityDescription = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua soupei latina';
+  TextEditingController descriptionController = TextEditingController();
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -30,11 +42,11 @@ class ReportScreen extends StatelessWidget {
                 ),
                 SizedBox(height: ScreenUtil().setHeight(10)),
                 CustomDropdown(
-                  items: catergory, 
+                  items: category, 
                   onChanged: (value) {}, 
                   hint: 'Select a category',
                 ),
-                SizedBox(height: ScreenUtil().setHeight(20)),
+                SizedBox(height: ScreenUtil().setHeight(15)),
 
                 const Text(
                   "Location", 
@@ -45,7 +57,7 @@ class ReportScreen extends StatelessWidget {
                   label: 'Location',
                   hintText: 'Enter location',
                 ),
-                SizedBox(height: ScreenUtil().setHeight(20)),
+                SizedBox(height: ScreenUtil().setHeight(15)),
 
                 const Text(
                   "Distance", 
@@ -56,23 +68,98 @@ class ReportScreen extends StatelessWidget {
                   label: 'Distance',
                   hintText: 'Enter distance from location',
                 ),
+                SizedBox(height: ScreenUtil().setHeight(15)),
+
+                const Text(
+                  "Severity", 
+                  style: TextStyle(color: Colors.black54)
+                ),
+                SizedBox(height: ScreenUtil().setHeight(10)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CustomRadiobutton(
+                      onChanged: (value) {
+                        setState(() {
+                          selectedRadioValue = value;
+                        });
+                      },
+                    )
+                  ],
+                ),
+                SizedBox(height: ScreenUtil().setHeight(15)),
+
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(width: 1.5, style: BorderStyle.solid, color: Colors.grey.shade400, ),
+                    borderRadius: BorderRadius.circular(10)
+                  ),
+                  padding: EdgeInsets.all(14),
+                  child: 
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Severity Level $selectedRadioValue',
+                          style: const TextStyle(
+                            color: COLOR_PRIMARY,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold
+                          ),
+                        ),
+                        SizedBox(height: ScreenUtil().setHeight(5)),
+                        Text(
+                          severityDescription
+                        ),
+                      ],
+                    ),
+                ),
                 SizedBox(height: ScreenUtil().setHeight(20)),
+
+                const Text(
+                  "Description", 
+                  style: TextStyle(color: Colors.black54)
+                ),
+                SizedBox(height: ScreenUtil().setHeight(10)),
+                CustomTextArea(
+                  controller: descriptionController,
+                  hintText: "Write your description about the issue here...",
+                  maxLines: 4,
+                ),
+                SizedBox(height: ScreenUtil().setHeight(20)),
+
+                const Text(
+                  "Image", 
+                  style: TextStyle(color: Colors.black54)
+                ),
+                SizedBox(height: ScreenUtil().setHeight(10)),
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(width: 1.5, style: BorderStyle.solid, color: Colors.grey.shade400, ),
+                    borderRadius: BorderRadius.circular(15)
+                  ),
+                  child: const Center(
+                  child: CustomImage(
+                      imageUrl: "assets/placeholder.png",
+                      placeholder: "assets/placeholder.png",
+                      width: double.infinity,
+                      height: 300,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                SizedBox(height: ScreenUtil().setHeight(20)),
+
+                CustomFilledButton(
+                  text: 'Submit', 
+                  onPressed: () => {}, //GoRouter.of(context).go('/home'),
+                  fullWidth: true,
+                ),
+                SizedBox(height: 30),
               ]
             ),
           ),
         ],
       ),
     ),
-  );
-  
-  DropdownMenuItem<String> buildMenuItem(String catergory) => DropdownMenuItem(
-    value: catergory,
-    child: 
-      Text(
-        catergory,
-        style: TextStyle(
-          fontSize: ScreenUtil().setSp(10)
-        ),
-      )
   );
 }

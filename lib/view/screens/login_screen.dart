@@ -20,106 +20,105 @@ class _LogInScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        child: Container(
+        child: Container( //TODO: ILAGAY SA LIST VIEW GAYA NG REGISTRATION
           color: Colors.white,
           height: ScreenUtil().screenHeight,
           width: ScreenUtil().screenWidth,
-          child: Form( // ✅ Keeping Form widget for login
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+          child: Center(
+            child: ListView(
+              shrinkWrap: true,
+              padding: EdgeInsets.symmetric(vertical: ScreenUtil().setWidth(50), horizontal: ScreenUtil().setWidth(25)),
               children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: ScreenUtil().setWidth(25),
-                  ),
-                  child: Column( // ✅ Wrapping multiple widgets inside a Column
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      /*const Image(
-                        image: AssetImage('package:e_alerto/assets/images/logos/E-ALERTO_Logo_Colored.png'),
-                        width: 267,
-                      ),*/
-                      SizedBox(height: ScreenUtil().setHeight(20)),
-                      const Text(
-                        "Hello, welcome!", 
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold
-                        )
-                      ),
-                      SizedBox(height: ScreenUtil().setHeight(40)), 
-                      const Text(
-                        "Username", 
-                        style: TextStyle(color: Colors.black54)
-                      ),
-                      SizedBox(height: ScreenUtil().setHeight(10)), // ✅ Now correctly placed inside Column
-                      CustomTextFormField(
-                        label: 'Username',
-                        hintText: 'Enter Username',
-                      ),
-                      SizedBox(height: ScreenUtil().setHeight(20)),
-                      const Text(
-                        "Password", 
-                        style: TextStyle(color: Colors.black54)
-                      ),
-                      SizedBox(height: ScreenUtil().setHeight(10)),
-                      CustomTextFormField(
-                        label: 'Password',
-                        hintText: 'Enter Password',
-                        isVisible: true, // Hide password input
-                        /*trailing: const Icon(
-                            Icons.visibility_off_outlined,
-                            color: Colors.grey,
-                          ),*/
-                      ),
-                      Container(
-                        alignment: Alignment.centerRight,
-                        child: 
-                          TextButton(
-                            onPressed: () {},
-                            style: ButtonStyle(
-                               overlayColor: WidgetStateProperty.all(Colors.transparent),
-                            ),
-                            child: 
-                              const Text(
-                                "Forgot password?", 
-                                style: TextStyle(
-                                  color: Colors.black87,
-                                ),
+                Form( // ✅ Keeping Form widget for login
+                  child: 
+                    Column( // ✅ Wrapping multiple widgets inside a Column
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Image(
+                          image: AssetImage('assets/images/logos/E-ALERTO_Logo_Colored.png'),
+                          width: 240,
+                        ),
+                        SizedBox(height: ScreenUtil().setHeight(10)),
+                        const Text(
+                          "Hello, welcome!", 
+                          style: TextStyle(
+                            color: Colors.black87,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold
+                          )
+                        ),
+                        SizedBox(height: ScreenUtil().setHeight(30)), 
+                        const Text(
+                          "Username", 
+                          style: TextStyle(color: Colors.black54)
+                        ),
+                        SizedBox(height: ScreenUtil().setHeight(10)), // ✅ Now correctly placed inside Column
+                        CustomTextFormField(
+                          label: 'Username',
+                          hintText: 'Enter Username',
+                        ),
+                        SizedBox(height: ScreenUtil().setHeight(15)),
+                        const Text(
+                          "Password", 
+                          style: TextStyle(color: Colors.black54)
+                        ),
+                        SizedBox(height: ScreenUtil().setHeight(10)),
+                        CustomTextFormField(
+                          label: 'Password',
+                          hintText: 'Enter Password',
+                          isVisible: true, // Hide password input
+                          /*trailing: const Icon(
+                              Icons.visibility_off_outlined,
+                              color: Colors.grey,
+                            ),*/
+                        ),
+                        Container(
+                          alignment: Alignment.centerRight,
+                          child: 
+                            TextButton(
+                              onPressed: () {},
+                              style: ButtonStyle(
+                                overlayColor: WidgetStateProperty.all(Colors.transparent),
                               ),
-                          ),
-                      ),
-                      SizedBox(height: 30), // Add spacing before button
-                      CustomFilledButton(
-                        text: 'Login', 
-                        onPressed: () => GoRouter.of(context).go('/home'),
-                        fullWidth: true,
-                      ),
-                      SizedBox(height: 30),
-                      Container(
-                        alignment: Alignment.center,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text('No account yet? ',
-                            ),
-                            GestureDetector(
-                              onTap: () => GoRouter.of(context).go(Routes.registrationPage),
-                              child: Text(
-                                'Register here',
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: COLOR_PRIMARY,
-                                  fontWeight: FontWeight.bold,
+                              child: 
+                                const Text(
+                                  "Forgot password?", 
+                                  style: TextStyle(
+                                    color: Colors.black87,
+                                  ),
                                 ),
+                            ),
+                        ),
+                        SizedBox(height: 30), // Add spacing before button
+                        CustomFilledButton(
+                          text: 'Login', 
+                          onPressed: () => GoRouter.of(context).go('/home'),
+                          fullWidth: true,
+                        ),
+                        SizedBox(height: 30),
+                        Container(
+                          alignment: Alignment.center,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text('No account yet? ',
                               ),
-                            )
-                          ],
+                              GestureDetector(
+                                onTap: () => GoRouter.of(context).go(Routes.registrationPage),
+                                child: Text(
+                                  'Register here',
+                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: COLOR_PRIMARY,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              )
+                            ],
+                          )
                         )
-                      )
-                    ],
-                  ),
-                ),
+                      ],
+                    ),
+                ),                          
               ],
             ),
           ),

@@ -101,8 +101,8 @@ class _PostCardState extends State<PostCard> {
                   children: [
                     Text(
                     widget.classification,
-                    style: TextStyle(
-                      fontSize: ScreenUtil().setSp(16),
+                    style: const TextStyle(
+                      fontSize: 16,//ScreenUtil().setSp(16),
                       color: Colors.black
                     ),
                   ),
@@ -111,11 +111,12 @@ class _PostCardState extends State<PostCard> {
                     style:  ElevatedButton.styleFrom(
                       backgroundColor: getStatusColor(widget.status),// Set background color
                       minimumSize: Size(ScreenUtil().setWidth(100), ScreenUtil().setHeight(25)), // Ensures a minimum width and height
-                      //maximumSize: const Size(150, 50),
+                      maximumSize: Size(ScreenUtil().setWidth(120), ScreenUtil().setHeight(100)),
+                      //textStyle: TextStyle(fontSize: 12) 
                     ),
                     child: Text(widget.status, 
                       style: TextStyle(
-                      fontSize: ScreenUtil().setSp(10),
+                      fontSize: 12, //ScreenUtil().setSp(10),
                       color: Colors.white
                       ),
                     ),
@@ -130,15 +131,15 @@ class _PostCardState extends State<PostCard> {
                   Text(
                     widget.location,
                     style: TextStyle(
-                      fontSize: ScreenUtil().setSp(12),
+                      fontSize: 14, //ScreenUtil().setSp(12),
                       color: Colors.black
                     ),
                   ),
-                  Padding(padding: EdgeInsets.fromLTRB(0, 0, 15, 0),
+                  Padding(padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
                     child: Text(
                       widget.date,
                       style: TextStyle(
-                        fontSize: ScreenUtil().setSp(12),
+                        fontSize: 12, //ScreenUtil().setSp(12),
                         color: Colors.black
                       ),
                     ),
@@ -151,7 +152,7 @@ class _PostCardState extends State<PostCard> {
                   Text(
                     widget.username,
                     style: TextStyle(
-                      fontSize: ScreenUtil().setSp(10),
+                      fontSize: 12, //ScreenUtil().setSp(10),
                       color: Colors.grey.shade600
                     ),
                   ),
@@ -167,7 +168,7 @@ class _PostCardState extends State<PostCard> {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: ScreenUtil().setSp(10),
+                        fontSize: 12, //ScreenUtil().setSp(10),
                         color: Colors.grey.shade600
                       ),
                     ),
@@ -183,12 +184,12 @@ class _PostCardState extends State<PostCard> {
                     onPressed: () {
                       vote(1);
                     }, 
-                    icon: Icon(Icons.arrow_circle_up, size: ScreenUtil().setSp(20), color: userVote == 1 ? COLOR_PRIMARY : Colors.grey.shade400, weight: 20,), 
+                    icon: Icon(Icons.arrow_circle_up, size: 20, /*ScreenUtil().setSp(20),*/ color: userVote == 1 ? COLOR_PRIMARY : Colors.grey.shade400, weight: 20,), 
                     label: Text(totalVote.toString(),
                       style: TextStyle(
                         color: userVote == 1 || userVote == -1 ? COLOR_PRIMARY : Colors.grey.shade400,
                         fontWeight: FontWeight.bold,
-                        fontSize: ScreenUtil().setSp(12)
+                        fontSize: 14, //ScreenUtil().setSp(12)
                       ),
                     ),          
                   ),
@@ -200,7 +201,7 @@ class _PostCardState extends State<PostCard> {
                     
                     style: IconButton.styleFrom(
                       foregroundColor: userVote == -1 ? COLOR_PRIMARY : Colors.grey.shade400,
-                      iconSize: ScreenUtil().setSp(20)
+                      iconSize: 20, //ScreenUtil().setSp(20)
                     ),
                   )
                 ],

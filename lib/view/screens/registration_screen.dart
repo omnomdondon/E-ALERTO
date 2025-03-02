@@ -46,20 +46,20 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         mainAxisAlignment: MainAxisAlignment.center, // ✅ Center items
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          /*const Image(
-                            image: AssetImage('package:e_alerto/assets/images/logos/E-ALERTO_Logo_Colored.png'),
-                            width: 267,
-                          ),*/
-                          SizedBox(height: ScreenUtil().setHeight(20)),
+                          const Image(
+                            image: AssetImage('assets/images/logos/E-ALERTO_Logo_Colored.png'),
+                            width: 220,
+                          ),
+                          SizedBox(height: ScreenUtil().setHeight(10)),
                           const Text(
                             "Let's get started!", 
                             style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 24,
+                              color: Colors.black87,
+                              fontSize: 18,
                               fontWeight: FontWeight.bold
                             )
                           ),
-                          SizedBox(height: ScreenUtil().setHeight(40)), 
+                          SizedBox(height: ScreenUtil().setHeight(30)), 
                           const Text("Email", style: TextStyle(color: Colors.black54)),
                           SizedBox(height: ScreenUtil().setHeight(10)),
                           CustomTextFormField(
@@ -68,14 +68,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                             inputType: TextInputType.emailAddress,
                             validator: (value)=> inputController.emailValidator(value)),
 
-                          SizedBox(height: ScreenUtil().setHeight(20)),
+                          SizedBox(height: ScreenUtil().setHeight(15)),
                           const Text("Username", style: TextStyle(color: Colors.black54)),
                           SizedBox(height: ScreenUtil().setHeight(10)),
                           CustomTextFormField(
                             hintText: 'Enter username',
                             controller: username,
                             validator: (value) => inputController.validator(value, "Username is required"),),
-                          SizedBox(height: ScreenUtil().setHeight(20)),
+                          SizedBox(height: ScreenUtil().setHeight(15)),
                           const Text("Password", style: TextStyle(color: Colors.black54)),
                           SizedBox(height: ScreenUtil().setHeight(10)),
                           
@@ -86,7 +86,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                             
                             validator: (value)=> inputController.passwordValidator(value)
                           ),
-                          SizedBox(height: ScreenUtil().setHeight(20)),
+                          SizedBox(height: ScreenUtil().setHeight(15)),
 
                           const Text("Confirm Password", style: TextStyle(color: Colors.black54)),
                           SizedBox(height: ScreenUtil().setHeight(10)),
