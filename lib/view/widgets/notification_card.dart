@@ -50,7 +50,7 @@ class _NotificationCardState extends State<NotificationCard> {
             side: BorderSide(color: Colors.grey.shade400, width: 0.5), // Adds a border
           ),
           margin: EdgeInsets.zero,
-          child: Padding(padding: EdgeInsets.fromLTRB(ScreenUtil().setSp(12), 0, ScreenUtil().setSp(12), ScreenUtil().setSp(12)),
+          child: Padding(padding: EdgeInsets.fromLTRB(ScreenUtil().setSp(12), ScreenUtil().setSp(10), ScreenUtil().setSp(12), ScreenUtil().setSp(12)),
             child: Row(
               children: [
                 Container(
@@ -61,8 +61,8 @@ class _NotificationCardState extends State<NotificationCard> {
                     backgroundImage: AssetImage('assets/placeholder.png'),
                   ),
                 ),
-                
                 SizedBox(width: ScreenUtil().setWidth(15)),
+
                 Flexible(
                   flex: 1,
                   child: 
@@ -135,10 +135,7 @@ class _NotificationCardState extends State<NotificationCard> {
                           ],
                         ),
                       ],
-                    )
-
-                    
-                    
+                    )           
                 )
               ],
             ),

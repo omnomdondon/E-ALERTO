@@ -4,9 +4,11 @@ import 'package:e_alerto/view/screens/home_screen.dart';
 import 'package:e_alerto/view/screens/login_screen.dart';
 import 'package:e_alerto/view/screens/notification_screen.dart';
 import 'package:e_alerto/view/screens/profile_screen.dart';
+import 'package:e_alerto/view/screens/rating_screen.dart';
 import 'package:e_alerto/view/screens/registration_screen.dart';
 import 'package:e_alerto/view/screens/report_screen.dart';
 import 'package:e_alerto/view/screens/search_screen.dart';
+import 'package:e_alerto/view/screens/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -68,6 +70,16 @@ final router = GoRouter(
             GoRoute(
               path: Routes.profilePage,
               builder: (context, state) => const ProfileScreen(),
+              routes: [
+                GoRoute(
+                  path: Routes.settingsPage,
+                  builder: (context, state) => const SettingsScreen(),
+                ),
+                GoRoute(
+                  path: Routes.ratingPage,
+                  builder: (context, state) => const RatingScreen(),
+                )
+              ]
             )
           ]
         )

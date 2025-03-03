@@ -1,6 +1,8 @@
 import 'package:e_alerto/constants.dart';
+import 'package:e_alerto/controller/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 
 class PostCard extends StatefulWidget {
   final String reportNumber;
@@ -13,6 +15,7 @@ class PostCard extends StatefulWidget {
   final String image;
   int initialUpVotes;
   int initialDownVotes;
+  bool rate;
 
   PostCard({
     super.key,
@@ -23,6 +26,7 @@ class PostCard extends StatefulWidget {
     required this.date,
     required this.username,
     required this.description,
+    this.rate = false,
     this.image = '',
     this.initialUpVotes = 0,
     this.initialDownVotes = 0,
@@ -81,12 +85,8 @@ class _PostCardState extends State<PostCard> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () =>
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => Placeholder() //TODO: DETAIL SCREEN RAAAAAAAAAAAA
-        ),
-      ),
+      widget.rate ? context.push(Routes.profileRating) : Placeholder(), //TODO: DETAIL SCREEN RAAAAAAAAAAAA
+
 
       child: Card(
         color: const Color.fromARGB(255, 246, 246, 246),
