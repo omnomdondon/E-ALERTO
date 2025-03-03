@@ -1,6 +1,4 @@
 import 'package:e_alerto/constants.dart';
-import 'package:e_alerto/controller/input_controller.dart';
-import 'package:e_alerto/controller/routes.dart';
 import 'package:e_alerto/view/widgets/custom_filledbutton.dart';
 import 'package:e_alerto/view/widgets/custom_textarea.dart';
 import 'package:e_alerto/view/widgets/post_card.dart';

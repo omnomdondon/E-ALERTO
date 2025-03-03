@@ -1,5 +1,6 @@
 import 'package:e_alerto/constants.dart';
 import 'package:e_alerto/controller/routes.dart';
+import 'package:e_alerto/view/screens/detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -85,8 +86,16 @@ class _PostCardState extends State<PostCard> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () =>
-      widget.rate ? context.push(Routes.profileRating) : Placeholder(), //TODO: DETAIL SCREEN RAAAAAAAAAAAA
-
+      widget.rate ? context.push(Routes.profileRating) : context.push(
+        '${Routes.homeDetail}?reportNumber=${widget.reportNumber}'
+        '&classification=${widget.classification}'
+        '&location=${widget.location}'
+        '&status=${widget.status}'
+        '&date=${widget.date}'
+        '&username=${widget.username}'
+        '&description=${widget.description}',
+        extra: '&image=${widget.image}',
+      ),
 
       child: Card(
         color: const Color.fromARGB(255, 246, 246, 246),

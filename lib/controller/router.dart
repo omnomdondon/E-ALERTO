@@ -1,5 +1,6 @@
 import 'package:e_alerto/controller/routes.dart';
 import 'package:e_alerto/view/layout_scaffold.dart';
+import 'package:e_alerto/view/screens/detail_screen.dart';
 import 'package:e_alerto/view/screens/home_screen.dart';
 import 'package:e_alerto/view/screens/login_screen.dart';
 import 'package:e_alerto/view/screens/notification_screen.dart';
@@ -38,6 +39,23 @@ final router = GoRouter(
             GoRoute(
               path: Routes.homePage,
               builder: (context, state) => const HomeScreen(),
+              routes: [
+                GoRoute(
+                  path: Routes.detailPage, // Ensure this has a parameter
+                  builder: (context, state) {
+                    return DetailScreen(
+                      reportNumber: state.uri.queryParameters['reportNumber'] ?? '',
+                      classification: state.uri.queryParameters['classification'] ?? '',
+                      location: state.uri.queryParameters['location'] ?? '',
+                      status: state.uri.queryParameters['status'] ?? '',
+                      date: state.uri.queryParameters['date'] ?? '',
+                      username: state.uri.queryParameters['username'] ?? '',
+                      description: state.uri.queryParameters['description'] ?? '',
+                      image: state.uri.queryParameters['image'] ?? ''
+                    );
+                  },
+                ),
+              ]
             )
           ]
         ),

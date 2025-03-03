@@ -1,6 +1,8 @@
 import 'package:e_alerto/constants.dart';
+import 'package:e_alerto/controller/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 
 class NotificationCard extends StatefulWidget {
   final String reportNumber;
@@ -13,6 +15,7 @@ class NotificationCard extends StatefulWidget {
   final String image;
   int initialUpVotes;
   int initialDownVotes;
+  bool rate;
 
   NotificationCard({
     super.key,
@@ -23,6 +26,7 @@ class NotificationCard extends StatefulWidget {
     required this.date,
     required this.username,
     required this.description,
+    this.rate = false,
     this.image = '',
     this.initialUpVotes = 0,
     this.initialDownVotes = 0,
@@ -35,13 +39,16 @@ class NotificationCard extends StatefulWidget {
 class _NotificationCardState extends State<NotificationCard> {
   Widget build(BuildContext context) {
       return GestureDetector(
-        onTap: () =>
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => Placeholder() //TODO: DETAIL SCREEN RAAAAAAAAAAAA
-          ),
-        ),
+        onTap: () => widget.rate ? context.push(Routes.profileRating) : context.push(
+        '${Routes.homeDetail}?reportNumber=${widget.reportNumber}'
+        '&classification=${widget.classification}'
+        '&location=${widget.location}'
+        '&status=${widget.status}'
+        '&date=${widget.date}'
+        '&username=${widget.username}'
+        '&description=${widget.description}',
+        extra: '&image=${widget.image}',
+      ),
 
         child: Card(
           color: Colors.white,
