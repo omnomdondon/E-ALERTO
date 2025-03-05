@@ -8,7 +8,32 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
 class RatingScreen extends StatefulWidget {
-  const RatingScreen({super.key});
+  final String reportNumber;
+  final String classification;
+  final String location;
+  final String status;
+  final String date;
+  final String username;
+  final String description;
+  final String image;
+  int initialUpVotes;
+  int initialDownVotes;
+  bool rate;
+
+  RatingScreen({
+    super.key,
+    required this.reportNumber,
+    required this.classification,
+    required this.location,
+    required this.status,
+    required this.date,
+    required this.username,
+    required this.description,
+    this.rate = false,
+    this.image = '',
+    this.initialUpVotes = 0,
+    this.initialDownVotes = 0,
+  });
 
   @override
   State<RatingScreen> createState() => _RatingScreenState();
@@ -48,14 +73,14 @@ class _RatingScreenState extends State<RatingScreen> {
       padding: EdgeInsets.all(ScreenUtil().setSp(15)),
       children: [
         PostCard(
-          reportNumber: '1',
-          classification: 'Classification',
-          location: 'Location',
-          status: 'Resolved',
-          date: '01/01/2025',
-          username: 'username',
-          description:
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
+          reportNumber: widget.reportNumber,
+          classification: widget.classification,
+          location: widget.location,
+          status: widget.status,
+          date: widget.date,
+          username: widget.username,
+          description: widget.description,
+          image: widget.image,
         ),
 
         Form(

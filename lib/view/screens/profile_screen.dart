@@ -39,7 +39,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   CircleAvatar(
                     radius: 40,
-                    backgroundImage: AssetImage('assets/placeholder.png'),
+                    backgroundImage: AssetImage('assets/images/profile.jpg'),
                   ),
                   SizedBox(width: ScreenUtil().setWidth(20)),
                   const Flexible(
@@ -48,7 +48,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Username',
+                          '@juan_dcruz',
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.black87,
@@ -136,65 +136,67 @@ Widget MyReportsTab() => ListView(
   padding: EdgeInsets.all(ScreenUtil().setSp(15)),
   children: [
     PostCard(
-    reportNumber: '1',
-    classification: 'Classification',
-    location: 'Location',
-    status: 'In Progress',
-    date: '01/01/2025',
-    username: 'username',
-    description:
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
+      reportNumber: '2',
+      classification: 'Deteriorated Parking',
+      location: '106 Mendiola St.',
+      status: 'In Progress', 
+      date: '3/1/2025',
+      username: '@juan_dcruz',
+      description: 'The surface of the public parking lot on 106 Mendiola Street is severely deteriorated, with large potholes and uneven surfaces.',
+      image: '/assets/images/image2.png',
     ),
     PostCard(
-    reportNumber: '1',
-    classification: 'Classification',
-    location: 'Location',
-    status: 'Accepted',
-    date: '01/01/2025',
-    username: 'username',
-    description:
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
+      reportNumber: '2',
+      classification: 'Broken Lamp Post',
+      location: '551 M.F. Jhocson St.',
+      status: 'Submitted', 
+      date: '3/1/2025',
+      username: '@juan_dcruz',
+      description: 'A lamp post has fell at M.F. Jhocson St. Near NU Manila',
+      image: '/assets/images/image5.png',
     ),
     PostCard(
-      reportNumber: '1',
-      classification: 'Classification',
-      location: 'Location',
-      status: 'Submitted',
-      date: '01/01/2025',
-      username: 'username',
-      description:
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
+      reportNumber: '2',
+      classification: 'Man Hole',
+      location: 'Legarda St.',
+      status: 'Accepted', 
+      date: '2/14/2025',
+      username: '@juan_dcruz',
+      description: 'This pot hole has not been resolved yet for a month. Please fix this, as it poses a potential risk in regards to traffic concerns and safety',
+      image: '/assets/images/image6.png',
     ),
   ],
 );
 
 Widget ToRateTab() => ListView.builder(
   padding: EdgeInsets.all(ScreenUtil().setSp(15)),
-  itemCount: 5,
-  itemBuilder: (context, index) => PostCard(
+  itemCount: 1,
+  itemBuilder: (context, index) => 
+  PostCard(
+    reportNumber: '2',
+    classification: 'Uneven Pavement',
+    location: '128 Panay Ave. QC',
+    status: 'Resolved', 
+    date: '2/2/2025',
+    username: '@juan_dcruz',
+    description: 'The surface of this pavement is uneven making it prone for accidents to the citizens',
+    image: '/assets/images/image7.png',
     rate: true,
-    reportNumber: '${index + 1}',
-    classification: 'Classification',
-    location: 'Location',
-    status: 'Resolved',
-    date: '01/01/2025',
-    username: 'username',
-    description:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
   ),
 );
 
 Widget HistoryTab() => ListView.builder(
   padding: EdgeInsets.all(ScreenUtil().setSp(15)),
-  itemCount: 5,
-  itemBuilder: (context, index) => PostCard(
-    reportNumber: '${index + 1}',
-    classification: 'Classification',
-    location: 'Location',
-    status: 'Rated',
-    date: '01/01/2025',
-    username: 'username',
-    description:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
+  itemCount: 1,
+  itemBuilder: (context, index) => 
+  PostCard(
+    reportNumber: '2',
+    classification: 'Dim Street Lamp',
+    location: '1110 Lacson St.',
+    status: 'Rated', 
+    date: '2/29/2025',
+    username: '@juan_dcruz',
+    description: 'The lamp in this street is always dim, it seems that it has been a while since it was last replaced',
+    image: '/assets/images/image8.png',
   ),
 );

@@ -37,6 +37,18 @@ class NotificationCard extends StatefulWidget {
 }
 
 class _NotificationCardState extends State<NotificationCard> {
+  String correctedImagePath = '';
+
+  @override
+  void initState() {
+    super.initState();
+    correctedImagePath = widget.image.startsWith('/')
+        ? widget.image.substring(1)
+        : widget.image;
+
+    debugPrint("Final image path used: $correctedImagePath");
+  }
+
   Widget build(BuildContext context) {
       return GestureDetector(
         onTap: () => widget.rate ? context.push(Routes.profileRating) : context.push(
@@ -47,7 +59,7 @@ class _NotificationCardState extends State<NotificationCard> {
         '&date=${widget.date}'
         '&username=${widget.username}'
         '&description=${widget.description}',
-        extra: '&image=${widget.image}',
+        extra: {'image': widget.image},
       ),
 
         child: Card(
@@ -65,7 +77,7 @@ class _NotificationCardState extends State<NotificationCard> {
                   height: 50,
                   child: CircleAvatar(
                     radius: ScreenUtil().setSp(15),
-                    backgroundImage: AssetImage('assets/placeholder.png'),
+                    backgroundImage: AssetImage(correctedImagePath),
                   ),
                 ),
                 SizedBox(width: ScreenUtil().setWidth(15)),

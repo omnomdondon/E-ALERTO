@@ -28,7 +28,7 @@ class PostCard extends StatefulWidget {
     required this.username,
     required this.description,
     this.rate = false,
-    this.image = '',
+    required this.image,
     this.initialUpVotes = 0,
     this.initialDownVotes = 0,
   });
@@ -86,7 +86,18 @@ class _PostCardState extends State<PostCard> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () =>
-      widget.rate ? context.push(Routes.profileRating) : context.push(
+      widget.rate ?
+      context.push(
+        '${Routes.profileRating}?reportNumber=${widget.reportNumber}'
+        '&classification=${widget.classification}'
+        '&location=${widget.location}'
+        '&status=${widget.status}'
+        '&date=${widget.date}'
+        '&username=${widget.username}'
+        '&description=${widget.description}',
+        extra: {'image': widget.image},
+      )
+      : context.push(
         '${Routes.homeDetail}?reportNumber=${widget.reportNumber}'
         '&classification=${widget.classification}'
         '&location=${widget.location}'
@@ -94,7 +105,7 @@ class _PostCardState extends State<PostCard> {
         '&date=${widget.date}'
         '&username=${widget.username}'
         '&description=${widget.description}',
-        extra: '&image=${widget.image}',
+        extra: {'image': widget.image},
       ),
 
       child: Card(
@@ -110,6 +121,8 @@ class _PostCardState extends State<PostCard> {
                   children: [
                     Text(
                     widget.classification,
+                    maxLines: 1, //TODO: FIX DIZ
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 16,//ScreenUtil().setSp(16),
                       color: Colors.black

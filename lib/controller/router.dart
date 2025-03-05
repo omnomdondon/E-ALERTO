@@ -51,7 +51,8 @@ final router = GoRouter(
                       date: state.uri.queryParameters['date'] ?? '',
                       username: state.uri.queryParameters['username'] ?? '',
                       description: state.uri.queryParameters['description'] ?? '',
-                      image: state.uri.queryParameters['image'] ?? ''
+                      //image: state.uri.queryParameters['image'] ?? '', extra: {},
+                      extra: state.extra as Map<String, dynamic>? ?? {},
                     );
                   },
                 ),
@@ -95,8 +96,20 @@ final router = GoRouter(
                 ),
                 GoRoute(
                   path: Routes.ratingPage,
-                  builder: (context, state) => const RatingScreen(),
-                )
+                  builder: (context, state) {
+                    final extra = state.extra as Map<String, dynamic>? ?? {};
+                    return RatingScreen(
+                      reportNumber: state.uri.queryParameters['reportNumber'] ?? '',
+                      classification: state.uri.queryParameters['classification'] ?? '',
+                      location: state.uri.queryParameters['location'] ?? '',
+                      status: state.uri.queryParameters['status'] ?? '',
+                      date: state.uri.queryParameters['date'] ?? '',
+                      username: state.uri.queryParameters['username'] ?? '',
+                      description: state.uri.queryParameters['description'] ?? '',
+                      image: extra['image'] ?? '', // ✅ Extract from `extra`
+                    );
+                  },
+                ),
               ]
             )
           ]

@@ -97,21 +97,40 @@ class _ReportScreenState extends State<ReportScreen> {
                   padding: EdgeInsets.all(14),
                   child: 
                     Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Severity Level $selectedRadioValue',
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                          'Severity Level $selectedRadioValue',
                           style: const TextStyle(
                             color: COLOR_PRIMARY,
                             fontSize: 15,
-                            fontWeight: FontWeight.bold
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),                          
+                        ]
+
+                      ),
+
+                      SizedBox(height: ScreenUtil().setHeight(5)),
+                      Row(
+                        children: [
+                          Flexible(child: Text(
+                            _getSeverityDescription(selectedRadioValue),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              //fontSize: 12, //ScreenUtil().setSp(10),
+                              color: Colors.grey.shade600
+                            ),
                           ),
                         ),
-                        SizedBox(height: ScreenUtil().setHeight(5)),
-                        Text(
-                          severityDescription
-                        ),
                       ],
-                    ),
+                      )
+                      
+                    ],
+                  ),
                 ),
                 SizedBox(height: ScreenUtil().setHeight(20)),
 
@@ -156,4 +175,25 @@ class _ReportScreenState extends State<ReportScreen> {
       ),
     ),
   );
+}
+
+String _getSeverityDescription(int value) {
+  switch (value) {
+    case 1:
+      return "Minimal impact, barely noticeable.";
+    case 2:
+      return "Minor issue, no major consequences.";
+    case 3:
+      return "Moderate severity, some disruptions.";
+    case 4:
+      return "Significant issue, requires attention.";
+    case 5:
+      return "High severity, potential risk involved.";
+    case 6:
+      return "Critical condition, urgent action needed.";
+    case 7:
+      return "Severe emergency, immediate response required!";
+    default:
+      return "Select a severity level.";
+  }
 }

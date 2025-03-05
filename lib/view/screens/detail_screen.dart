@@ -15,25 +15,28 @@ class DetailScreen extends StatefulWidget {
   final String date;
   final String username;
   final String description;
+  final bool rate;
   final String image;
-  int initialUpVotes;
-  int initialDownVotes;
-  bool rate;
+  final int initialUpVotes;
+  final int initialDownVotes;
 
-  DetailScreen({
-    super.key,
-    this.reportNumber = '1',
-    this.classification = 'classification',
-    this.location = 'location',
-    this.status = 'status',
-    this.date = 'date',
-    this.username = 'username',
-    this.description = 'description',
-    this.rate = false,
-    this.image = 'assets/placeholder.png',
-    this.initialUpVotes = 0,
-    this.initialDownVotes = 0,
-  });
+DetailScreen({
+  super.key,
+  this.reportNumber = '1',
+  this.classification = 'classification',
+  this.location = 'location',
+  this.status = 'status',
+  this.date = 'date',
+  this.username = 'username',
+  this.description = 'description',
+  this.rate = false,
+  this.initialUpVotes = 0,
+  this.initialDownVotes = 0,
+  Map<String, dynamic>? extra, 
+}) : image = extra?['image'] ?? '' {
+  debugPrint("Constructor image path: $image");
+}
+// Prevent null access
 
   @override
   State<DetailScreen> createState() => _DetailScreenState();
@@ -44,6 +47,7 @@ class _DetailScreenState extends State<DetailScreen> {
   int downVotes = 0;
   int totalVote = 0;
   int userVote = 0; // 1 for upvote, -1 for downvote, 0 for neutral
+  String correctedImagePath = '';
 
   @override
   void initState() {
@@ -51,6 +55,13 @@ class _DetailScreenState extends State<DetailScreen> {
     upVotes = widget.initialUpVotes;
     downVotes = widget.initialDownVotes;
     totalVote = upVotes - downVotes;
+
+    // Remove the leading slash
+    correctedImagePath = widget.image.startsWith('/')
+        ? widget.image.substring(1)
+        : widget.image;
+
+    debugPrint("Final image path used: $correctedImagePath");
   }
 
   void vote(int voteType) {
@@ -205,7 +216,7 @@ class _DetailScreenState extends State<DetailScreen> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(20),
                       child: Image.asset(
-                        'assets/placeholder.png',
+                        correctedImagePath,
                         width: double.infinity, // ✅ Take available space
                         height: ScreenUtil().setHeight(200), // ✅ Avoid full screen height
                         fit: BoxFit.cover, // ✅ Adjust to fill container
