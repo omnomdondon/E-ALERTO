@@ -42,49 +42,32 @@ class CustomTextFormField extends StatefulWidget {
 }
 
 class _CustomTextFormFieldState extends State<CustomTextFormField> {
-  late bool _isObscured;
-
-  @override
-  void initState() {
-    super.initState();
-    _isObscured = widget.isVisible;
-  }
-
-  void _toggleVisibility() {
-    setState(() {
-      _isObscured = !_isObscured;
-    });
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-        validator: widget.validator,
+      validator: widget.validator,
         controller: widget.controller,
         inputFormatters: widget.inputFormat,
         keyboardType: widget.inputType,
-        style: const TextStyle(color: Colors.black87, fontSize: 14),
         //Automatically validates without pressing the button
         autovalidateMode: AutovalidateMode.onUserInteraction,
 
         // ObscureText | Shows or hides text field's value to users
-        obscureText: _isObscured,
-
+        obscureText: widget.isVisible,
         decoration: InputDecoration(
 
           //label: Text(widget.label),
           hintText: widget.hintText,
           //prefixIcon: Icon(widget.icon),
-          //suffixIcon: widget.trailing,
-
-          
+          suffixIcon: widget.trailing,
 
           //enabledBorder | Default Text field decoration
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
             borderSide: BorderSide(
-              color: Colors.grey.shade400,
-              width: 1
+              color: Colors.grey.withOpacity(.3),
+              width: 1.5
             ),
           ),
 
@@ -114,15 +97,9 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
                 width: 2
             ),
           ),
-
-          suffixIcon: widget.isVisible
-            ? IconButton(
-                icon: Icon(_isObscured ? Icons.visibility_off_outlined : Icons.visibility_outlined),
-                onPressed: _toggleVisibility,
-              )
-            : null,
         ),
     );
+    throw UnimplementedError();
   }
   
 }

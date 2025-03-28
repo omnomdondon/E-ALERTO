@@ -116,7 +116,7 @@ final router = GoRouter(
           routes: [
             GoRoute(
               path: Routes.reportPage,
-              pageBuilder: (context, state) => MaterialPage<void>(
+              pageBuilder: (context, state) => const MaterialPage<void>(
                 child: ReportScreen(),
               ),
             ),
@@ -128,7 +128,7 @@ final router = GoRouter(
           routes: [
             GoRoute(
               path: Routes.notificationPage,
-              pageBuilder: (context, state) => MaterialPage<void>(
+              pageBuilder: (context, state) => const MaterialPage<void>(
                 child: NotificationScreen(),
               ),
             ),

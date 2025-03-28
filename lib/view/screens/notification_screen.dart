@@ -50,7 +50,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           body: TabBarView( // ✅ Place inside the body
             children: [
               ListView(
-                children: [
+                children: const [
                   NotificationCard(
                     reportNumber: '1',
                     classification: 'Cracked Bridge',
@@ -64,7 +64,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 ],
               ),
               ListView(
-                children: [
+                children: const [
                   NotificationCard(
                     reportNumber: '2',
                     classification: 'Deteriorated Parking',

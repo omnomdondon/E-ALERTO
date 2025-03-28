@@ -134,7 +134,7 @@ class _TabBarDelegate extends SliverPersistentHeaderDelegate {
 
 Widget MyReportsTab() => ListView(
   padding: EdgeInsets.all(ScreenUtil().setSp(15)),
-  children: [
+  children: const [
     PostCard(
       reportNumber: '2',
       classification: 'Deteriorated Parking',
@@ -172,7 +172,7 @@ Widget ToRateTab() => ListView.builder(
   padding: EdgeInsets.all(ScreenUtil().setSp(15)),
   itemCount: 1,
   itemBuilder: (context, index) => 
-  PostCard(
+  const PostCard(
     reportNumber: '2',
     classification: 'Uneven Pavement',
     location: '128 Panay Ave. QC',
@@ -189,7 +189,7 @@ Widget HistoryTab() => ListView.builder(
   padding: EdgeInsets.all(ScreenUtil().setSp(15)),
   itemCount: 1,
   itemBuilder: (context, index) => 
-  PostCard(
+  const PostCard(
     reportNumber: '2',
     classification: 'Dim Street Lamp',
     location: '1110 Lacson St.',

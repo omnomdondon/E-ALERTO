@@ -13,7 +13,7 @@ class SearchScreen extends StatelessWidget {
       children: [
         Padding(
           padding: EdgeInsets.fromLTRB(ScreenUtil().setSp(15), 2, ScreenUtil().setSp(15), 2), // ✅ Add some spacing
-          child: Form(
+          child: const Form(
             child: CustomTextFormField(
               label: 'Search',
               hintText: 'Search',

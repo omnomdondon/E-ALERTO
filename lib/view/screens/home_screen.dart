@@ -12,7 +12,7 @@ class HomeScreen extends StatelessWidget {
     body: Center(
       child: ListView(
         padding: EdgeInsets.all(ScreenUtil().setSp(15)),
-        children: [
+        children: const [
           PostCard(
             reportNumber: '1',
             classification: 'Cracked Bridge',

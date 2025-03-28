@@ -52,7 +52,7 @@ class _ReportScreenState extends State<ReportScreen> {
                   style: TextStyle(color: Colors.black54)
                 ),
                 SizedBox(height: ScreenUtil().setHeight(10)),
-                CustomTextFormField(
+                const CustomTextFormField(
                   label: 'Location',
                   hintText: 'Enter location',
                 ),
@@ -63,7 +63,7 @@ class _ReportScreenState extends State<ReportScreen> {
                   style: TextStyle(color: Colors.black54)
                 ),
                 SizedBox(height: ScreenUtil().setHeight(10)),
-                CustomTextFormField(
+                const CustomTextFormField(
                   label: 'Distance',
                   hintText: 'Enter distance from location',
                 ),
