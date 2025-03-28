@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "288160619445",
+    "project_id": "e-alerto-34adf",
+    "storage_bucket": "e-alerto-34adf.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:288160619445:android:c612f7691e446c1e7757fc",
+        "android_client_info": {
+          "package_name": "com.example.e_alerto"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "288160619445-p1uvlkkjfg2f8v2e7oa5mb6mbtavos7h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtwljZKzdxkXX6bk2zX-1BJyYfPUerjAU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "288160619445-p1uvlkkjfg2f8v2e7oa5mb6mbtavos7h.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "288160619445-vvncm8p98ofccqvd9mghi0po6fd2g0sg.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.eAlerto"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
