@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class CustomRadiobutton extends StatefulWidget {
   final Function(int) onChanged; // Callback function
 
-  const CustomRadiobutton({Key? key, required this.onChanged}) : super(key: key);
+  const CustomRadiobutton({super.key, required this.onChanged});
 
   @override
   _CustomRadioButtonState createState() => _CustomRadioButtonState();

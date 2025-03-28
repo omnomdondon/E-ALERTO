@@ -10,14 +10,14 @@ class CustomTextArea extends StatelessWidget {
   final double borderRadius;
 
   const CustomTextArea({
-    Key? key,
+    super.key,
     required this.controller,
     this.hintText = "Enter your text...",
     this.maxLines = 5,
     this.borderColor = COLOR_PRIMARY,
     this.fillColor = Colors.white,
     this.borderRadius = 10.0,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

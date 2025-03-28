@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '/constants.dart';
 
 class CustomTextFormField extends StatefulWidget {
-  CustomTextFormField(
+  const CustomTextFormField(
     {
       super.key,
       this.label = "label name",
@@ -63,7 +63,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
         controller: widget.controller,
         inputFormatters: widget.inputFormat,
         keyboardType: widget.inputType,
-        style: TextStyle(color: Colors.black87, fontSize: 14),
+        style: const TextStyle(color: Colors.black87, fontSize: 14),
         //Automatically validates without pressing the button
         autovalidateMode: AutovalidateMode.onUserInteraction,
 
@@ -123,7 +123,6 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
             : null,
         ),
     );
-    throw UnimplementedError();
   }
   
 }

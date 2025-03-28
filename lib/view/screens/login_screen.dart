@@ -155,20 +155,22 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 30),
-                      CustomFilledButton(
-                        text: 'Login',
-                        onPressed: _signInWithEmailAndPassword,
-                        fullWidth: true,
-                      ),
-                      SizedBox(height: 15),
+                      const SizedBox(height: 30),
+                      _isLoading
+                          ? const Center(child: CircularProgressIndicator())
+                          : CustomFilledButton(
+                              text: 'Login',
+                              onPressed: _signInWithEmailAndPassword,
+                              fullWidth: true,
+                            ),
+                      const SizedBox(height: 15),
                       const Center(
                         child: Text(
                           'OR',
                           style: TextStyle(color: Colors.grey),
                         ),
                       ),
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
                       OutlinedButton(
                         onPressed: _signInWithGoogle,
                         style: OutlinedButton.styleFrom(
@@ -190,7 +192,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ],
                         ),
                       ),
-                      SizedBox(height: 30),
+                      const SizedBox(height: 30),
                       Container(
                         alignment: Alignment.center,
                         child: Row(

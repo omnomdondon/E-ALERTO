@@ -1,11 +1,10 @@
 import 'package:e_alerto/constants.dart';
 import 'package:e_alerto/view/widgets/notification_card.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 // TODO: FIX ERROR IN BUILDING STATE, NAG-EERROR KAPAG LUMIPAT NG PAGE WHILE SWIPING SA TABVIEW, BASTA YON
 class NotificationScreen extends StatefulWidget {
-  NotificationScreen({super.key});
+  const NotificationScreen({super.key});
 
   @override 
   State<NotificationScreen> createState() => _NotificationScreenState();

@@ -1,6 +1,5 @@
 import 'package:e_alerto/constants.dart';
 import 'package:e_alerto/controller/routes.dart';
-import 'package:e_alerto/view/screens/detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -14,11 +13,11 @@ class PostCard extends StatefulWidget {
   final String username;
   final String description;
   final String image;
-  int initialUpVotes;
-  int initialDownVotes;
-  bool rate;
+  final int initialUpVotes;
+  final int initialDownVotes;
+  final bool rate;
 
-  PostCard({
+  const PostCard({
     super.key,
     required this.reportNumber,
     required this.classification,
@@ -137,7 +136,7 @@ class _PostCardState extends State<PostCard> {
                       //textStyle: TextStyle(fontSize: 12) 
                     ),
                     child: Text(widget.status, 
-                      style: TextStyle(
+                      style: const TextStyle(
                       fontSize: 12, //ScreenUtil().setSp(10),
                       color: Colors.white
                       ),
@@ -152,15 +151,15 @@ class _PostCardState extends State<PostCard> {
                 children: [
                   Text(
                     widget.location,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 14, //ScreenUtil().setSp(12),
                       color: Colors.black
                     ),
                   ),
-                  Padding(padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
+                  Padding(padding: const EdgeInsets.fromLTRB(0, 0, 5, 0),
                     child: Text(
                       widget.date,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 12, //ScreenUtil().setSp(12),
                         color: Colors.black
                       ),

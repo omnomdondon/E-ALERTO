@@ -22,7 +22,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       surfaceTintColor: Colors.white,
       actions: [
         IconButton(
-          icon: Icon(Icons.settings_outlined, size: 24,),  // ⚙️ Settings Icon
+          icon: const Icon(Icons.settings_outlined, size: 24,),  // ⚙️ Settings Icon
           onPressed: () => context.push(Routes.profileSettings)
         ),
       ],
@@ -37,7 +37,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               padding: EdgeInsets.all(ScreenUtil().setSp(15)),
               child: Row(
                 children: [
-                  CircleAvatar(
+                  const CircleAvatar(
                     radius: 40,
                     backgroundImage: AssetImage('assets/images/profile.jpg'),
                   ),

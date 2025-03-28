@@ -1,7 +1,6 @@
 import 'package:e_alerto/constants.dart';
 import 'package:e_alerto/view/widgets/custom_dropdownmenu.dart';
 import 'package:e_alerto/view/widgets/custom_filledbutton.dart';
-import 'package:e_alerto/view/widgets/custom_image.dart';
 import 'package:e_alerto/view/widgets/custom_radiobutton.dart';
 import 'package:e_alerto/view/widgets/custom_textarea.dart';
 import 'package:e_alerto/view/widgets/custom_textformfield.dart';
@@ -9,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ReportScreen extends StatefulWidget {
-  ReportScreen({super.key});
+  const ReportScreen({super.key});
 
   @override
   State<ReportScreen> createState() => _ReportScreenState();
@@ -94,7 +93,7 @@ class _ReportScreenState extends State<ReportScreen> {
                     border: Border.all(width: 1.5, style: BorderStyle.solid, color: Colors.grey.shade400, ),
                     borderRadius: BorderRadius.circular(10)
                   ),
-                  padding: EdgeInsets.all(14),
+                  padding: const EdgeInsets.all(14),
                   child: 
                     Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -167,7 +166,7 @@ class _ReportScreenState extends State<ReportScreen> {
                   onPressed: () => {}, //GoRouter.of(context).go('/home'),
                   fullWidth: true,
                 ),
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
               ]
             ),
           ),

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class CustomDropdown extends StatefulWidget {
   final List<String> items;
@@ -33,7 +31,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: selectedItem,
-          hint: Text(widget.hint, style: TextStyle(color: Colors.black87, fontSize: 14)),
+          hint: Text(widget.hint, style: const TextStyle(color: Colors.black87, fontSize: 14)),
           icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey.shade400,),
           isExpanded: true, // Makes the dropdown fill the width
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(),

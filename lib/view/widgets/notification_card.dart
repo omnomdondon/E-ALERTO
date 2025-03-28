@@ -13,11 +13,11 @@ class NotificationCard extends StatefulWidget {
   final String username;
   final String description;
   final String image;
-  int initialUpVotes;
-  int initialDownVotes;
-  bool rate;
+  final int initialUpVotes;
+  final int initialDownVotes;
+  final bool rate;
 
-  NotificationCard({
+  const NotificationCard({
     super.key,
     required this.reportNumber,
     required this.classification,
@@ -49,6 +49,7 @@ class _NotificationCardState extends State<NotificationCard> {
     debugPrint("Final image path used: $correctedImagePath");
   }
 
+  @override
   Widget build(BuildContext context) {
       return GestureDetector(
         onTap: () => widget.rate ? context.push(Routes.profileRating) : context.push(
@@ -72,7 +73,7 @@ class _NotificationCardState extends State<NotificationCard> {
           child: Padding(padding: EdgeInsets.fromLTRB(ScreenUtil().setSp(12), ScreenUtil().setSp(10), ScreenUtil().setSp(12), ScreenUtil().setSp(12)),
             child: Row(
               children: [
-                Container(
+                SizedBox(
                   width: 50,
                   height: 50,
                   child: CircleAvatar(
@@ -121,15 +122,15 @@ class _NotificationCardState extends State<NotificationCard> {
                           children: [
                             Text(
                               widget.location,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 14, //ScreenUtil().setSp(12),
                                 color: Colors.black
                               ),
                             ),
-                            Padding(padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
+                            Padding(padding: const EdgeInsets.fromLTRB(0, 0, 5, 0),
                               child: Text(
                                 widget.date,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 12, //ScreenUtil().setSp(12),
                                   color: Colors.black
                                 ),

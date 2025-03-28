@@ -1,8 +1,6 @@
 import 'package:e_alerto/constants.dart';
 import 'package:flutter/material.dart';
-import '../widgets/custom_filledbutton.dart';
 
-import 'package:flutter/material.dart';
 
 class CustomFilledButton extends StatelessWidget {
   final String text;

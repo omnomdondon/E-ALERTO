@@ -1,5 +1,4 @@
 import 'package:e_alerto/view/widgets/custom_textformfield.dart';
-import 'package:e_alerto/view/widgets/post_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 

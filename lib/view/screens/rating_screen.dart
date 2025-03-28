@@ -16,11 +16,11 @@ class RatingScreen extends StatefulWidget {
   final String username;
   final String description;
   final String image;
-  int initialUpVotes;
-  int initialDownVotes;
-  bool rate;
+  final int initialUpVotes;
+  final int initialDownVotes;
+  final bool rate;
 
-  RatingScreen({
+  const RatingScreen({
     super.key,
     required this.reportNumber,
     required this.classification,
@@ -55,12 +55,12 @@ class _RatingScreenState extends State<RatingScreen> {
         padding: const EdgeInsets.all(8.0), // Adjust padding as needed
         child: Container(
           width: 5,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: COLOR_PRIMARY, // Background color
             shape: BoxShape.circle, // Makes it circular
           ),
           child: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.white), // Icon color
+            icon: const Icon(Icons.arrow_back, color: Colors.white), // Icon color
             onPressed: () {
               GoRouter.of(context).pop();
             },
@@ -132,7 +132,7 @@ Widget _buildRatingRow(String label, double rating, Function(double) onRatingUpd
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+          Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
           RatingBar.builder(
             initialRating: rating,
             minRating: 1,
@@ -140,8 +140,8 @@ Widget _buildRatingRow(String label, double rating, Function(double) onRatingUpd
             allowHalfRating: false,
             itemCount: 5,
             itemSize: 25,
-            itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-            itemBuilder: (context, _) => Icon(Icons.star, color: COLOR_INPROGRESS),
+            itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
+            itemBuilder: (context, _) => const Icon(Icons.star, color: COLOR_INPROGRESS),
             onRatingUpdate: onRatingUpdate,
           ),
         ],
