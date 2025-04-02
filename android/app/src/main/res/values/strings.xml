@@ -1,0 +1,4 @@
+<resources>
+    <string name="default_web_client_id">288160619445-p1uvlkkjfg2f8v2e7oa5mb6mbtavos7h.apps.googleusercontent.com</string>
+    <string name="firebase_dynamic_links_default_domain">e_alerto.page.link</string>
+</resources>

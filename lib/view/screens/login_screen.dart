@@ -4,13 +4,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_sign_in/google_sign_in.dart'; // Ensure this import is present
-
+import 'package:google_sign_in/google_sign_in.dart';
 import '../widgets/custom_textformfield.dart';
 import '../widgets/custom_filledbutton.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  final GoogleSignIn googleSignIn;
+
+  const LoginScreen({super.key, required this.googleSignIn});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -21,6 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool _obscurePassword = true;
 
   Future<void> _signInWithEmailAndPassword() async {
     if (!_formKey.currentState!.validate()) return;
@@ -31,7 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      // Navigation is handled by AuthGate and router redirect
+      if (mounted) context.go('/${Routes.homePage.substring(1)}');
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.message ?? 'Authentication failed')),
@@ -44,21 +46,41 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _signInWithGoogle() async {
     setState(() => _isLoading = true);
     try {
-      final googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) return;
-      
-      final googleAuth = await googleUser.authentication;
-      final credential = GoogleAuthProvider.credential(
+      final GoogleSignInAccount? googleUser =
+          await widget.googleSignIn.signIn();
+      if (googleUser == null) {
+        setState(() => _isLoading = false);
+        return;
+      }
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      final OAuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-      
+
       await FirebaseAuth.instance.signInWithCredential(credential);
-      // Navigation is handled by AuthGate and router redirect
+
+      if (mounted) {
+        context.go(Routes.homePage);
+      }
     } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? 'Google sign in failed')),
-      );
+      debugPrint('Google Sign-In Error: ${e.code} - ${e.message}');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Sign-In failed: ${e.message ?? 'Unknown error'}')),
+        );
+      }
+    } catch (e) {
+      debugPrint('Google Sign-In Error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error during Google sign in: $e')),
+        );
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -93,21 +115,22 @@ class _LoginScreenState extends State<LoginScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Image(
-                        image: AssetImage('assets/images/logos/E-ALERTO_Logo_Colored.png'),
+                        image: AssetImage(
+                            'assets/images/logos/E-ALERTO_Logo_Colored.png'),
                         width: 240,
                       ),
                       SizedBox(height: ScreenUtil().setHeight(10)),
                       const Text(
-                        "Hello, welcome!", 
+                        "Hello, welcome!",
                         style: TextStyle(
                           color: Colors.black87,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: ScreenUtil().setHeight(30)), 
+                      SizedBox(height: ScreenUtil().setHeight(30)),
                       const Text(
-                        "Email", 
+                        "Email",
                         style: TextStyle(color: Colors.black54),
                       ),
                       SizedBox(height: ScreenUtil().setHeight(10)),
@@ -124,7 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       SizedBox(height: ScreenUtil().setHeight(15)),
                       const Text(
-                        "Password", 
+                        "Password",
                         style: TextStyle(color: Colors.black54),
                       ),
                       SizedBox(height: ScreenUtil().setHeight(10)),
@@ -132,7 +155,20 @@ class _LoginScreenState extends State<LoginScreen> {
                         controller: _passwordController,
                         label: 'Password',
                         hintText: 'Enter Password',
-                        isVisible: true,
+                        obscureText: _obscurePassword,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Colors.grey,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
+                          },
+                        ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your password';
@@ -145,13 +181,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: TextButton(
                           onPressed: () {},
                           style: ButtonStyle(
-                            overlayColor: WidgetStateProperty.all(Colors.transparent),
+                            overlayColor:
+                                WidgetStateProperty.all(Colors.transparent),
                           ),
                           child: const Text(
-                            "Forgot password?", 
-                            style: TextStyle(
-                              color: Colors.black87,
-                            ),
+                            "Forgot password?",
+                            style: TextStyle(color: Colors.black87),
                           ),
                         ),
                       ),
@@ -165,30 +200,24 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                       const SizedBox(height: 15),
                       const Center(
-                        child: Text(
-                          'OR',
-                          style: TextStyle(color: Colors.grey),
-                        ),
+                        child: Text('OR', style: TextStyle(color: Colors.grey)),
                       ),
                       const SizedBox(height: 15),
-                      OutlinedButton(
+                      CustomFilledButton(
+                        text: 'Sign in with Google',
                         onPressed: _signInWithGoogle,
-                        style: OutlinedButton.styleFrom(
-                          minimumSize: const Size(double.infinity, 50),
-                          side: const BorderSide(color: Colors.grey),
-                        ),
+                        fullWidth: true,
+                        backgroundColor: Colors.white,
+                        textColor: Colors.black87,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Image.asset(
-                              'assets/images/google_logo.png',
+                              'assets/images/icons/google_icon.png',
                               height: 24,
                             ),
                             const SizedBox(width: 10),
-                            const Text(
-                              'Sign in with Google',
-                              style: TextStyle(color: Colors.black87),
-                            ),
+                            const Text('Sign in with Google'),
                           ],
                         ),
                       ),
@@ -203,10 +232,13 @@ class _LoginScreenState extends State<LoginScreen> {
                               onTap: () => context.go(Routes.registrationPage),
                               child: Text(
                                 'Register here',
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: COLOR_PRIMARY,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(
+                                      color: COLOR_PRIMARY,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                               ),
                             ),
                           ],
@@ -214,7 +246,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ],
                   ),
-                ),                          
+                ),
               ],
             ),
           ),
@@ -223,136 +255,3 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-
-// import 'package:e_alerto/constants.dart';
-// import 'package:e_alerto/controller/routes.dart';
-// import 'package:flutter/material.dart';
-// import 'package:flutter_screenutil/flutter_screenutil.dart';
-// import 'package:go_router/go_router.dart';
-
-// import '../widgets/custom_textformfield.dart';
-// import '../widgets/custom_filledbutton.dart';
-
-// class LoginScreen extends StatefulWidget {
-//   const LoginScreen({super.key});
-
-//   @override
-//   State<LoginScreen> createState() => _LogInScreenState();
-// }
-
-// class _LogInScreenState extends State<LoginScreen> {
-  
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: SingleChildScrollView(
-//         child: Container( 
-//           color: Colors.white,
-//           height: ScreenUtil().screenHeight,
-//           width: ScreenUtil().screenWidth,
-//           child: Center(
-//             child: ListView(
-//               shrinkWrap: true,
-//               padding: EdgeInsets.symmetric(vertical: ScreenUtil().setWidth(50), horizontal: ScreenUtil().setWidth(25)),
-//               children: [
-//                 Form( // ✅ Keeping Form widget for login
-//                   child: 
-//                     Column( // ✅ Wrapping multiple widgets inside a Column
-//                       crossAxisAlignment: CrossAxisAlignment.start,
-//                       children: [
-//                         const Image(
-//                           image: AssetImage('assets/images/logos/E-ALERTO_Logo_Colored.png'),
-//                           width: 240,
-//                         ),
-//                         SizedBox(height: ScreenUtil().setHeight(10)),
-//                         const Text(
-//                           "Hello, welcome!", 
-//                           style: TextStyle(
-//                             color: Colors.black87,
-//                             fontSize: 18,
-//                             fontWeight: FontWeight.bold
-//                           )
-//                         ),
-//                         SizedBox(height: ScreenUtil().setHeight(30)), 
-//                         const Text(
-//                           "Username", 
-//                           style: TextStyle(color: Colors.black54)
-//                         ),
-//                         SizedBox(height: ScreenUtil().setHeight(10)), // ✅ Now correctly placed inside Column
-//                         CustomTextFormField(
-//                           label: 'Username',
-//                           hintText: 'Enter Username',
-//                         ),
-//                         SizedBox(height: ScreenUtil().setHeight(15)),
-//                         const Text(
-//                           "Password", 
-//                           style: TextStyle(color: Colors.black54)
-//                         ),
-//                         SizedBox(height: ScreenUtil().setHeight(10)),
-//                         CustomTextFormField(
-//                           label: 'Password',
-//                           hintText: 'Enter Password',
-//                           isVisible: true, // Hide password input
-//                           /*trailing: const Icon(
-//                               Icons.visibility_off_outlined,
-//                               color: Colors.grey,
-//                             ),*/
-//                         ),
-//                         Container(
-//                           alignment: Alignment.centerRight,
-//                           child: 
-//                             TextButton(
-//                               onPressed: () {},
-//                               style: ButtonStyle(
-//                                 overlayColor: WidgetStateProperty.all(Colors.transparent),
-//                               ),
-//                               child: 
-//                                 const Text(
-//                                   "Forgot password?", 
-//                                   style: TextStyle(
-//                                     color: Colors.black87,
-//                                   ),
-//                                 ),
-//                             ),
-//                         ),
-//                         SizedBox(height: 30), // Add spacing before button
-//                         CustomFilledButton(
-//                           text: 'Login', 
-//                           onPressed: () => GoRouter.of(context).go('/home'),
-//                           fullWidth: true,
-//                         ),
-//                         SizedBox(height: 30),
-//                         Container(
-//                           alignment: Alignment.center,
-//                           child: Row(
-//                             mainAxisAlignment: MainAxisAlignment.center,
-//                             children: [
-//                               const Text('No account yet? ',
-//                               ),
-//                               GestureDetector(
-//                                 onTap: () => GoRouter.of(context).go(Routes.registrationPage),
-//                                 child: Text(
-//                                   'Register here',
-//                                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-//                                     color: COLOR_PRIMARY,
-//                                     fontWeight: FontWeight.bold,
-//                                   ),
-//                                 ),
-//                               )
-//                             ],
-//                           )
-//                         )
-//                       ],
-//                     ),
-//                 ),                          
-//               ],
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-
-//     throw UnimplementedError();
-//   }
-  
-// }
