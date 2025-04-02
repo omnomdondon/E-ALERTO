@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../controller/routes.dart';
-import '../auth_gate.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
