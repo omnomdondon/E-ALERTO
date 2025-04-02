@@ -1,11 +1,8 @@
-could you add a validation where if a user attempts to register an existing credential (or registers using google) they will be told that there is already an existing credential?
-
-profile_screen.dart:
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:e_alerto/constants.dart';
 import 'package:e_alerto/controller/routes.dart';
-import 'package:e_alerto/view/widgets/custom_filledbutton.dart';
 import 'package:e_alerto/view/widgets/post_card.dart';
+import 'package:e_alerto/view/widgets/custom_filledbutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -139,66 +136,188 @@ class _ProfileScreenState extends State<ProfileScreen> {
             SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.all(ScreenUtil().setSp(15)),
-                child: Row(
+                child: Column(
                   children: [
-                    CircleAvatar(
-                      radius: 40,
-                      backgroundColor: Colors.grey,
-                      child: isGoogleUser && user?.photoURL != null
-                          ? ClipOval(
-                              child: Image.network(
-                                user!.photoURL!,
-                                width: 80,
-                                height: 80,
-                                fit: BoxFit.cover,
-                              ),
-                            )
-                          : const Icon(
-                              Icons.person,
-                              size: 40,
-                              color: Colors.white,
-                            ),
-                    ),
-                    SizedBox(width: ScreenUtil().setWidth(20)),
-                    Flexible(
-                      flex: 1,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                isGoogleUser
-                                    ? user?.displayName ?? 'Google User'
-                                    : '@${user?.email?.split('@')[0] ?? "user"}',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.black87,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              if (isEmailVerified)
-                                const Padding(
-                                  padding: EdgeInsets.only(left: 4.0),
-                                  child: Icon(
-                                    Icons.verified,
-                                    color: Colors.blue,
-                                    size: 20,
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 40,
+                          backgroundColor: Colors.grey,
+                          child: isGoogleUser && user?.photoURL != null
+                              ? ClipOval(
+                                  child: Image.network(
+                                    user!.photoURL!,
+                                    width: 80,
+                                    height: 80,
+                                    fit: BoxFit.cover,
                                   ),
+                                )
+                              : const Icon(
+                                  Icons.person,
+                                  size: 40,
+                                  color: Colors.white,
                                 ),
+                        ),
+                        SizedBox(width: ScreenUtil().setWidth(20)),
+                        Flexible(
+                          flex: 1,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    isGoogleUser
+                                        ? user?.displayName ?? 'Google User'
+                                        : '@${user?.email?.split('@')[0] ?? "user"}',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.black87,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  if (isEmailVerified)
+                                    const Padding(
+                                      padding: EdgeInsets.only(left: 4.0),
+                                      child: Icon(
+                                        Icons.verified,
+                                        color: Colors.blue,
+                                        size: 20,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              const Text(
+                                'Edit Profile',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.black87,
+                                ),
+                              ),
                             ],
                           ),
-                          const SizedBox(height: 4),
-                          const Text(
-                            'Edit Profile',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.black87,
+                        ),
+                      ],
+                    ),
+                    if (!isGoogleUser &&
+                        !isEmailVerified &&
+                        !showVerificationSuccessMessage)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: SizedBox(
+                                height: 48, // Fixed height to prevent overflow
+                                child: CustomFilledButton(
+                                  onPressed: isVerificationInProgress
+                                      ? null
+                                      : () async {
+                                          await sendVerificationEmail();
+                                        },
+                                  backgroundColor: COLOR_PRIMARY,
+                                  textColor: Colors.white,
+                                  padding: 12, // Reduced padding to fit content
+                                  child: const FittedBox(
+                                    // Ensures content fits within button
+                                    fit: BoxFit.scaleDown,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize
+                                          .min, // Takes minimum required space
+                                      children: [
+                                        Icon(
+                                          Icons.mark_email_unread,
+                                          size: 18,
+                                          color: COLOR_SECONDARY,
+                                        ),
+                                        SizedBox(width: 8),
+                                        Text(
+                                          'Verify Email',
+                                          overflow: TextOverflow.ellipsis,
+                                          style:
+                                              TextStyle(color: COLOR_SECONDARY),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: SizedBox(
+                                height:
+                                    48, // Fixed height to match first button
+                                child: CustomFilledButton(
+                                  onPressed: isVerificationInProgress
+                                      ? null
+                                      : () async {
+                                          await checkEmailVerification();
+                                        },
+                                  backgroundColor: COLOR_SECONDARY,
+                                  textColor: Colors.black87,
+                                  padding: 12, // Reduced padding to fit content
+                                  child: const FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.refresh,
+                                          size: 18,
+                                          color: COLOR_PRIMARY,
+                                        ),
+                                        SizedBox(width: 8),
+                                        Text(
+                                          'Check Status',
+                                          overflow: TextOverflow.ellipsis,
+                                          style:
+                                              TextStyle(color: COLOR_PRIMARY),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    )
+                    if (showVerificationSuccessMessage)
+                      Container(
+                        width: double.infinity,
+                        margin: const EdgeInsets.only(top: 16),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12, horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.green,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.check, color: Colors.white),
+                            SizedBox(width: 8),
+                            Text(
+                              'Email Verified Successfully!',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    if (isVerificationInProgress)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 8.0),
+                        child: CircularProgressIndicator(),
+                      ),
                   ],
                 ),
               ),
@@ -226,112 +345,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
           ],
-          body: Column(
-            children: [
-              if (!isGoogleUser && !isEmailVerified)
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  margin: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.orange[50],
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.orange),
-                  ),
-                  child: Column(
-                    children: [
-                      const Text(
-                        'Your email is not verified. Please verify to access all features.',
-                        style: TextStyle(
-                          color: Colors.orange,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
-                      CustomFilledButton(
-                        text: 'Send Verification Email',
-                        onPressed: isVerificationInProgress
-                            ? null
-                            : sendVerificationEmail,
-                        fullWidth: true,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(Icons.email_outlined, size: 18),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Send Verification Email',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: isVerificationInProgress
-                                    ? Colors.grey
-                                    : Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      CustomFilledButton(
-                        text: 'Check Verification Status',
-                        onPressed: isVerificationInProgress
-                            ? null
-                            : checkEmailVerification,
-                        fullWidth: true,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(Icons.refresh, size: 18),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Check Verification Status',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: isVerificationInProgress
-                                    ? Colors.grey
-                                    : Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (isVerificationInProgress)
-                        const Padding(
-                          padding: EdgeInsets.only(top: 8.0),
-                          child: CircularProgressIndicator(),
-                        ),
-                    ],
-                  ),
-                ),
-              if (showVerificationSuccessMessage)
-                Container(
-                  color: Colors.green,
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.check, color: Colors.white),
-                      SizedBox(width: 8),
-                      Text(
-                        'Email Verified Successfully!',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              const Expanded(
-                child: TabBarView(
-                  children: [
-                    MyReportsTab(),
-                    ToRateTab(),
-                    HistoryTab(),
-                  ],
-                ),
-              ),
-            ],
+          body: const Expanded(
+            child: TabBarView(
+              children: [
+                MyReportsTab(),
+                ToRateTab(),
+                HistoryTab(),
+              ],
+            ),
           ),
         ),
       ),

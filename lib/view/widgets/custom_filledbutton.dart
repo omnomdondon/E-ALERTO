@@ -1,9 +1,10 @@
+// In custom_filledbutton.dart
 import 'package:e_alerto/constants.dart';
 import 'package:flutter/material.dart';
 
 class CustomFilledButton extends StatelessWidget {
-  final String text;
-  final VoidCallback onPressed;
+  final String? text;
+  final VoidCallback? onPressed;
   final Color backgroundColor;
   final Color textColor;
   final double borderRadius;
@@ -11,11 +12,11 @@ class CustomFilledButton extends StatelessWidget {
   final double fontSize;
   final double? height;
   final bool fullWidth;
-  final Widget? child; // New property for custom child widget
+  final Widget? child;
 
   const CustomFilledButton({
     super.key,
-    required this.text,
+    this.text,
     required this.onPressed,
     this.backgroundColor = COLOR_PRIMARY,
     this.textColor = Colors.white,
@@ -24,7 +25,7 @@ class CustomFilledButton extends StatelessWidget {
     this.fontSize = 16.0,
     this.height,
     this.fullWidth = false,
-    this.child, // Added child parameter
+    this.child,
   });
 
   @override
@@ -44,8 +45,7 @@ class CustomFilledButton extends StatelessWidget {
         onPressed: onPressed,
         child: child ??
             Text(
-              // Use child if provided, otherwise use text
-              text,
+              text ?? '',
               style: TextStyle(
                 fontSize: fontSize,
                 color: textColor,
