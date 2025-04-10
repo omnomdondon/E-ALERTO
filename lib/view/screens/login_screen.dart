@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter/foundation.dart';
 import '../widgets/custom_textformfield.dart';
 import '../widgets/custom_filledbutton.dart';
 
@@ -33,7 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      if (mounted) context.go('/${Routes.homePage.substring(1)}');
+      if (mounted) context.goNamed('home');
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.message ?? 'Authentication failed')),
@@ -46,8 +47,15 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _signInWithGoogle() async {
     setState(() => _isLoading = true);
     try {
-      final GoogleSignInAccount? googleUser =
-          await widget.googleSignIn.signIn();
+      GoogleSignInAccount? googleUser;
+
+      if (kIsWeb) {
+        googleUser = await widget.googleSignIn.signInSilently();
+        googleUser ??= await widget.googleSignIn.signIn();
+      } else {
+        googleUser = await widget.googleSignIn.signIn();
+      }
+
       if (googleUser == null) {
         setState(() => _isLoading = false);
         return;
@@ -64,21 +72,27 @@ class _LoginScreenState extends State<LoginScreen> {
       await FirebaseAuth.instance.signInWithCredential(credential);
 
       if (mounted) {
-        context.go(Routes.homePage);
+        context.goNamed('home');
       }
     } on FirebaseAuthException catch (e) {
       debugPrint('Google Sign-In Error: ${e.code} - ${e.message}');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text('Sign-In failed: ${e.message ?? 'Unknown error'}')),
+            content:
+                Text('Google Sign-In failed: ${e.message ?? 'Unknown error'}'),
+            duration: const Duration(seconds: 3),
+          ),
         );
       }
     } catch (e) {
       debugPrint('Google Sign-In Error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error during Google sign in: $e')),
+          SnackBar(
+            content: Text('Error during Google sign in: ${e.toString()}'),
+            duration: const Duration(seconds: 3),
+          ),
         );
       }
     } finally {

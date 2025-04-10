@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'firebase_options.dart';
 
@@ -39,9 +40,10 @@ class _MainAppState extends State<MainApp> {
   void initState() {
     super.initState();
     _googleSignIn = GoogleSignIn(
-      scopes: ['email'],
-      serverClientId:
-          '288160619445-p1uvlkkjfg2f8v2e7oa5mb6mbtavos7h.apps.googleusercontent.com',
+      scopes: ['email', 'profile'],
+      clientId: kIsWeb
+          ? '288160619445-qtkmrdjpv67n8gf5ric0kl4it3iqtg44.apps.googleusercontent.com' // Web client ID
+          : DefaultFirebaseOptions.currentPlatform.iosClientId,
     );
     _router = createRouter(_googleSignIn);
   }

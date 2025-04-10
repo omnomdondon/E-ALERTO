@@ -26,22 +26,21 @@ GoRouter createRouter(GoogleSignIn googleSignIn) {
     debugLogDiagnostics: true,
     redirect: (BuildContext context, GoRouterState state) async {
       final User? user = FirebaseAuth.instance.currentUser;
-      final bool isAuthPath = state.matchedLocation.startsWith(Routes.auth);
+      final isAuthRoute = state.matchedLocation.startsWith(Routes.auth);
 
       debugPrint(
           'Router redirect - path: ${state.matchedLocation}, user: ${user?.uid}');
 
-      // User not signed in and trying to access protected route
-      if (user == null && !isAuthPath) {
+      // If user is null and we're not on an auth route, go to login
+      if (user == null && !isAuthRoute) {
         return Routes.loginPage;
       }
 
-      // User signed in and trying to access auth route
-      if (user != null && isAuthPath) {
+      // If user exists and we're on auth route, go to home
+      if (user != null && isAuthRoute) {
         return Routes.homePage;
       }
 
-      // No redirect needed
       return null;
     },
     routes: [
@@ -161,7 +160,9 @@ GoRouter createRouter(GoogleSignIn googleSignIn) {
                     path: Routes.settingsPage,
                     name: 'settings',
                     pageBuilder: (context, state) {
-                      return const MaterialPage<void>(child: SettingsScreen());
+                      return MaterialPage<void>(
+                        child: SettingsScreen(googleSignIn: googleSignIn),
+                      );
                     },
                   ),
                   GoRoute(

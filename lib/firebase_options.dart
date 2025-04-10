@@ -63,6 +63,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '288160619445',
     projectId: 'e-alerto-34adf',
     storageBucket: 'e-alerto-34adf.firebasestorage.app',
+    androidClientId: '288160619445-qtkmrdjpv67n8gf5ric0kl4it3iqtg44.apps.googleusercontent.com',
     iosClientId: '288160619445-vvncm8p98ofccqvd9mghi0po6fd2g0sg.apps.googleusercontent.com',
     iosBundleId: 'com.example.eAlerto',
   );
@@ -73,6 +74,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '288160619445',
     projectId: 'e-alerto-34adf',
     storageBucket: 'e-alerto-34adf.firebasestorage.app',
+    androidClientId: '288160619445-qtkmrdjpv67n8gf5ric0kl4it3iqtg44.apps.googleusercontent.com',
     iosClientId: '288160619445-vvncm8p98ofccqvd9mghi0po6fd2g0sg.apps.googleusercontent.com',
     iosBundleId: 'com.example.eAlerto',
   );

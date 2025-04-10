@@ -39,7 +39,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      if (mounted) context.go('/${Routes.homePage.substring(1)}');
+      if (mounted) context.goNamed('home');
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.message ?? 'Registration failed')),
@@ -67,24 +67,33 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         idToken: googleAuth.idToken,
       );
 
-      await FirebaseAuth.instance.signInWithCredential(credential);
+      final UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithCredential(credential);
+
+      debugPrint('Signed up with Google: ${userCredential.user?.uid}');
 
       if (mounted) {
-        context.go(Routes.homePage);
+        context.goNamed('home');
       }
     } on FirebaseAuthException catch (e) {
-      debugPrint('Google Sign-In Error: ${e.code} - ${e.message}');
+      debugPrint('Google Sign-Up Error: ${e.code} - ${e.message}');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text('Sign-In failed: ${e.message ?? 'Unknown error'}')),
+            content:
+                Text('Google Sign-Up failed: ${e.message ?? 'Unknown error'}'),
+            duration: const Duration(seconds: 3),
+          ),
         );
       }
     } catch (e) {
-      debugPrint('Google Sign-In Error: $e');
+      debugPrint('Google Sign-Up Error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error during Google sign in: $e')),
+          SnackBar(
+            content: Text('Error during Google sign up: $e'),
+            duration: const Duration(seconds: 3),
+          ),
         );
       }
     } finally {

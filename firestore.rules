@@ -1,0 +1,48 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow public username availability checks
+    match /users {
+      allow list: if 
+        request.query != null &&
+        request.query.limit == 1 && 
+        request.query.where != null &&
+        size(request.query.where) == 1 &&
+        request.query.where[0].fieldPath == 'username' &&
+        request.query.where[0].op == '==' &&
+        request.query.where[0].value is string;
+    }
+    
+    // User document rules
+    match /users/{userId} {
+      allow create: if request.auth == null || request.auth.uid == userId;
+      allow read, update, delete: if request.auth != null && request.auth.uid == userId;
+      
+      // Data validation
+      function isValidUser() {
+        return request.resource.data.keys().hasAll(['uid', 'email', 'username', 'createdAt'])
+          && request.resource.data.size() >= 4
+          && request.resource.data.uid == userId
+          && request.resource.data.email is string
+          && request.resource.data.username is string
+          && request.resource.data.createdAt is timestamp;
+      }
+      
+      allow create: if isValidUser();
+    }
+    
+    // Development rules - allow public access to OTP collections
+    match /otps/{email} {
+      allow read, write: if true;
+    }
+    
+    match /otp_attempts/{email} {
+      allow read, write: if true;
+    }
+    
+    // Default deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

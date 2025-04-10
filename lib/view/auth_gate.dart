@@ -13,7 +13,44 @@ class AuthGate extends StatefulWidget {
   @override
   State<AuthGate> createState() => _AuthGateState();
 
-  static logout(BuildContext context, GoogleSignIn googleSignIn) {}
+  static Future<void> logout(
+      BuildContext context, GoogleSignIn googleSignIn) async {
+    try {
+      // Sign out from both services with proper error handling
+      await Future.wait([
+        googleSignIn.signOut().catchError((e) {
+          debugPrint('Google sign out error: $e');
+        }),
+        FirebaseAuth.instance.signOut(),
+      ]);
+
+      // Clear any cached credentials
+      await googleSignIn.disconnect().catchError((e) {
+        debugPrint('Google disconnect error: $e');
+      });
+
+      // Ensure complete sign out
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      if (context.mounted) {
+        // Navigate to login screen
+        final router = GoRouter.of(context);
+        router.goNamed('login');
+      }
+    } catch (e) {
+      debugPrint('Logout error: $e');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Logout failed: ${e.toString()}'),
+            duration: const Duration(seconds: 3),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+      rethrow;
+    }
+  }
 }
 
 class _AuthGateState extends State<AuthGate> {
@@ -36,43 +73,32 @@ class _AuthGateState extends State<AuthGate> {
 
         // User is not signed in
         if (user == null) {
+          if (!currentRoute.startsWith(Routes.auth)) {
+            Future.microtask(() {
+              if (mounted) {
+                // ignore: use_build_context_synchronously
+                context.goNamed('login');
+              }
+            });
+          }
           return LoginScreen(googleSignIn: widget.googleSignIn);
         }
 
         // User is signed in but on auth route - redirect to home
         if (currentRoute.startsWith(Routes.auth)) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) context.go(Routes.homePage);
+          Future.microtask(() {
+            // ignore: use_build_context_synchronously
+            if (mounted) context.goNamed('home');
           });
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
         }
 
-        // Let the router handle navigation for other cases
         return const Scaffold(
           body: Center(child: CircularProgressIndicator()),
         );
       },
     );
-  }
-
-  static Future<void> logout(
-      BuildContext context, GoogleSignIn googleSignIn) async {
-    try {
-      await googleSignIn.signOut();
-      await FirebaseAuth.instance.signOut();
-
-      if (context.mounted) {
-        context.go(Routes.loginPage);
-      }
-    } catch (e) {
-      debugPrint('Logout error: $e');
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Logout failed: ${e.toString()}')),
-        );
-      }
-    }
   }
 }
