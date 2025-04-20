@@ -1,9 +1,9 @@
 class Routes {
   Routes._();
-  
+
   // Base paths
   static const String auth = '/auth';
-  
+
   // Auth routes
   static const String loginPage = '$auth/login';
   static const String registrationPage = '$auth/registration';
@@ -16,6 +16,8 @@ class Routes {
   // Feature routes
   static const String searchPage = '/search';
   static const String reportPage = '/report';
+  static const String cameraPage = 'camera';
+  static const String reportCamera = '$reportPage/camera';
   static const String notificationPage = '/notification';
 
   // Profile routes

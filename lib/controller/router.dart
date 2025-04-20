@@ -11,6 +11,7 @@ import 'package:e_alerto/view/screens/registration_screen.dart';
 import 'package:e_alerto/view/screens/report_screen.dart';
 import 'package:e_alerto/view/screens/search_screen.dart';
 import 'package:e_alerto/view/screens/settings_screen.dart';
+import 'package:e_alerto/view/screens/camera_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -31,53 +32,35 @@ GoRouter createRouter(GoogleSignIn googleSignIn) {
       debugPrint(
           'Router redirect - path: ${state.matchedLocation}, user: ${user?.uid}');
 
-      // If user is null and we're not on an auth route, go to login
-      if (user == null && !isAuthRoute) {
-        return Routes.loginPage;
-      }
-
-      // If user exists and we're on auth route, go to home
-      if (user != null && isAuthRoute) {
-        return Routes.homePage;
-      }
-
+      if (user == null && !isAuthRoute) return Routes.loginPage;
+      if (user != null && isAuthRoute) return Routes.homePage;
       return null;
     },
     routes: [
       GoRoute(
         path: Routes.auth,
         name: 'auth',
-        pageBuilder: (context, state) {
-          return MaterialPage<void>(
-            child: AuthGate(googleSignIn: googleSignIn),
-          );
-        },
+        pageBuilder: (context, state) =>
+            MaterialPage(child: AuthGate(googleSignIn: googleSignIn)),
         routes: [
           GoRoute(
             path: 'login',
             name: 'login',
-            pageBuilder: (context, state) {
-              return MaterialPage<void>(
-                child: LoginScreen(googleSignIn: googleSignIn),
-              );
-            },
+            pageBuilder: (context, state) =>
+                MaterialPage(child: LoginScreen(googleSignIn: googleSignIn)),
           ),
           GoRoute(
             path: 'registration',
             name: 'registration',
-            pageBuilder: (context, state) {
-              return MaterialPage<void>(
-                child: RegistrationScreen(googleSignIn: googleSignIn),
-              );
-            },
+            pageBuilder: (context, state) => MaterialPage(
+                child: RegistrationScreen(googleSignIn: googleSignIn)),
           ),
         ],
       ),
       StatefulShellRoute.indexedStack(
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state, navigationShell) {
-          return LayoutScaffold(navigationShell: navigationShell);
-        },
+        builder: (context, state, navigationShell) =>
+            LayoutScaffold(navigationShell: navigationShell),
         branches: [
           StatefulShellBranch(
             navigatorKey: _shellNavigatorKey,
@@ -85,30 +68,27 @@ GoRouter createRouter(GoogleSignIn googleSignIn) {
               GoRoute(
                 path: Routes.homePage,
                 name: 'home',
-                pageBuilder: (context, state) {
-                  return const MaterialPage<void>(child: HomeScreen());
-                },
+                pageBuilder: (context, state) =>
+                    const MaterialPage(child: HomeScreen()),
                 routes: [
                   GoRoute(
                     path: Routes.detailPage,
                     name: 'detail',
-                    pageBuilder: (context, state) {
-                      return MaterialPage<void>(
-                        child: DetailScreen(
-                          reportNumber:
-                              state.uri.queryParameters['reportNumber'] ?? '',
-                          classification:
-                              state.uri.queryParameters['classification'] ?? '',
-                          location: state.uri.queryParameters['location'] ?? '',
-                          status: state.uri.queryParameters['status'] ?? '',
-                          date: state.uri.queryParameters['date'] ?? '',
-                          username: state.uri.queryParameters['username'] ?? '',
-                          description:
-                              state.uri.queryParameters['description'] ?? '',
-                          extra: state.extra as Map<String, dynamic>? ?? {},
-                        ),
-                      );
-                    },
+                    pageBuilder: (context, state) => MaterialPage(
+                      child: DetailScreen(
+                        reportNumber:
+                            state.uri.queryParameters['reportNumber'] ?? '',
+                        classification:
+                            state.uri.queryParameters['classification'] ?? '',
+                        location: state.uri.queryParameters['location'] ?? '',
+                        status: state.uri.queryParameters['status'] ?? '',
+                        date: state.uri.queryParameters['date'] ?? '',
+                        username: state.uri.queryParameters['username'] ?? '',
+                        description:
+                            state.uri.queryParameters['description'] ?? '',
+                        extra: state.extra as Map<String, dynamic>? ?? {},
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -119,9 +99,8 @@ GoRouter createRouter(GoogleSignIn googleSignIn) {
               GoRoute(
                 path: Routes.searchPage,
                 name: 'search',
-                pageBuilder: (context, state) {
-                  return const MaterialPage<void>(child: SearchScreen());
-                },
+                pageBuilder: (context, state) =>
+                    const MaterialPage(child: SearchScreen()),
               ),
             ],
           ),
@@ -131,8 +110,19 @@ GoRouter createRouter(GoogleSignIn googleSignIn) {
                 path: Routes.reportPage,
                 name: 'report',
                 pageBuilder: (context, state) {
-                  return const MaterialPage<void>(child: ReportScreen());
+                  final imagePath = state.extra as String?;
+                  return MaterialPage(
+                    child: ReportScreen(imagePath: imagePath),
+                  );
                 },
+                routes: [
+                  GoRoute(
+                    path: Routes.cameraPage,
+                    name: 'camera',
+                    pageBuilder: (context, state) =>
+                        const MaterialPage(child: CameraScreen()),
+                  ),
+                ],
               ),
             ],
           ),
@@ -141,9 +131,8 @@ GoRouter createRouter(GoogleSignIn googleSignIn) {
               GoRoute(
                 path: Routes.notificationPage,
                 name: 'notifications',
-                pageBuilder: (context, state) {
-                  return const MaterialPage<void>(child: NotificationScreen());
-                },
+                pageBuilder: (context, state) =>
+                    const MaterialPage(child: NotificationScreen()),
               ),
             ],
           ),
@@ -152,41 +141,35 @@ GoRouter createRouter(GoogleSignIn googleSignIn) {
               GoRoute(
                 path: Routes.profilePage,
                 name: 'profile',
-                pageBuilder: (context, state) {
-                  return const MaterialPage<void>(child: ProfileScreen());
-                },
+                pageBuilder: (context, state) =>
+                    const MaterialPage(child: ProfileScreen()),
                 routes: [
                   GoRoute(
                     path: Routes.settingsPage,
                     name: 'settings',
-                    pageBuilder: (context, state) {
-                      return MaterialPage<void>(
-                        child: SettingsScreen(googleSignIn: googleSignIn),
-                      );
-                    },
+                    pageBuilder: (context, state) => MaterialPage(
+                        child: SettingsScreen(googleSignIn: googleSignIn)),
                   ),
                   GoRoute(
                     path: Routes.ratingPage,
                     name: 'rating',
-                    pageBuilder: (context, state) {
-                      return MaterialPage<void>(
-                        child: RatingScreen(
-                          reportNumber:
-                              state.uri.queryParameters['reportNumber'] ?? '',
-                          classification:
-                              state.uri.queryParameters['classification'] ?? '',
-                          location: state.uri.queryParameters['location'] ?? '',
-                          status: state.uri.queryParameters['status'] ?? '',
-                          date: state.uri.queryParameters['date'] ?? '',
-                          username: state.uri.queryParameters['username'] ?? '',
-                          description:
-                              state.uri.queryParameters['description'] ?? '',
-                          image: (state.extra
-                                  as Map<String, dynamic>?)?['image'] ??
-                              '',
-                        ),
-                      );
-                    },
+                    pageBuilder: (context, state) => MaterialPage(
+                      child: RatingScreen(
+                        reportNumber:
+                            state.uri.queryParameters['reportNumber'] ?? '',
+                        classification:
+                            state.uri.queryParameters['classification'] ?? '',
+                        location: state.uri.queryParameters['location'] ?? '',
+                        status: state.uri.queryParameters['status'] ?? '',
+                        date: state.uri.queryParameters['date'] ?? '',
+                        username: state.uri.queryParameters['username'] ?? '',
+                        description:
+                            state.uri.queryParameters['description'] ?? '',
+                        image:
+                            (state.extra as Map<String, dynamic>?)?['image'] ??
+                                '',
+                      ),
+                    ),
                   ),
                 ],
               ),

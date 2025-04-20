@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:e_alerto/constants.dart';
+import 'package:e_alerto/controller/routes.dart';
 import 'package:e_alerto/view/widgets/custom_dropdownmenu.dart';
 import 'package:e_alerto/view/widgets/custom_filledbutton.dart';
 import 'package:e_alerto/view/widgets/custom_radiobutton.dart';
@@ -6,9 +8,11 @@ import 'package:e_alerto/view/widgets/custom_textarea.dart';
 import 'package:e_alerto/view/widgets/custom_textformfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 
 class ReportScreen extends StatefulWidget {
-  const ReportScreen({super.key});
+  final String? imagePath;
+  const ReportScreen({super.key, this.imagePath});
 
   @override
   State<ReportScreen> createState() => _ReportScreenState();
@@ -18,6 +22,31 @@ class _ReportScreenState extends State<ReportScreen> {
   final category = ['Road', 'Foot Bridge', 'Sidewalk', 'Lamp Post'];
   int selectedRadioValue = 1;
   TextEditingController descriptionController = TextEditingController();
+  String? _imagePath;
+  bool _isImageValid = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _imagePath = widget.imagePath;
+    _validateImage();
+  }
+
+  void _validateImage() {
+    setState(() {
+      _isImageValid = _imagePath != null && File(_imagePath!).existsSync();
+    });
+  }
+
+  Future<void> _openCamera() async {
+    final result = await context.push<String>(Routes.reportCamera);
+    if (result != null && mounted) {
+      setState(() {
+        _imagePath = result;
+        _isImageValid = true;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -126,19 +155,36 @@ class _ReportScreenState extends State<ReportScreen> {
                 style: TextStyle(color: Colors.black54),
               ),
               SizedBox(height: ScreenUtil().setHeight(10)),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Image.asset(
-                  'assets/placeholder.png',
-                  width: double.infinity,
-                  height: MediaQuery.of(context).size.height * 0.3,
-                  fit: BoxFit.cover,
+              GestureDetector(
+                onTap: _openCamera,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    width: double.infinity,
+                    height: MediaQuery.of(context).size.height * 0.3,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: _buildImageWidget(),
+                  ),
                 ),
               ),
               SizedBox(height: ScreenUtil().setHeight(20)),
               CustomFilledButton(
                 text: 'Submit',
-                onPressed: () {},
+                onPressed: () {
+                  if (!_isImageValid) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Please take a photo first'),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                    return;
+                  }
+                  // Handle submission with _imagePath
+                },
                 fullWidth: true,
               ),
               const SizedBox(height: 30),
@@ -146,6 +192,47 @@ class _ReportScreenState extends State<ReportScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildImageWidget() {
+    if (_imagePath == null || !File(_imagePath!).existsSync()) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.camera_alt, size: 50, color: Colors.grey),
+          SizedBox(height: ScreenUtil().setHeight(10)),
+          const Text('Tap to take photo', style: TextStyle(color: Colors.grey)),
+        ],
+      );
+    }
+
+    try {
+      return Image.file(
+        File(_imagePath!),
+        width: double.infinity,
+        height: MediaQuery.of(context).size.height * 0.3,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => _buildErrorWidget(),
+      );
+    } catch (e) {
+      return _buildErrorWidget();
+    }
+  }
+
+  Widget _buildErrorWidget() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Icon(Icons.error_outline, size: 50, color: Colors.red),
+        SizedBox(height: ScreenUtil().setHeight(10)),
+        const Text('Failed to load image', style: TextStyle(color: Colors.red)),
+        SizedBox(height: ScreenUtil().setHeight(10)),
+        TextButton(
+          onPressed: _openCamera,
+          child: const Text('Retake Photo'),
+        ),
+      ],
     );
   }
 
