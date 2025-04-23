@@ -10,7 +10,7 @@ class AcceptedScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final acceptedReports = reports
-        .where((report) => (report.status?.toLowerCase() ?? '') == 'accepted')
+        .where((report) => (report.status.toLowerCase() ?? '') == 'accepted')
         .toList();
 
     return Scaffold(

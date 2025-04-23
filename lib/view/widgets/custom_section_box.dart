@@ -17,7 +17,7 @@ class CustomSectionBox extends StatelessWidget {
   Widget build(BuildContext context) {
     final filteredReports = reports
         .where((report) =>
-            (report.status?.toLowerCase() ?? '') ==
+            (report.status.toLowerCase() ?? '') ==
             selectedStatus.toLowerCase())
         .toList();
 
