@@ -10,7 +10,7 @@ class ResolvedScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final resolvedReports = reports
-        .where((report) => (report.status.toLowerCase() ?? '') == 'resolved')
+        .where((report) => (report.status.toLowerCase()) == 'resolved')
         .toList();
 
     return Scaffold(

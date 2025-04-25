@@ -11,7 +11,7 @@ class InProgressScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final inProgressReports = reports
         .where(
-            (report) => (report.status.toLowerCase() ?? '') == 'in progress')
+            (report) => (report.status.toLowerCase()) == 'in progress')
         .toList();
 
     return Scaffold(

@@ -10,7 +10,7 @@ class SubmittedScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final submittedReports = reports
-        .where((report) => (report.status.toLowerCase() ?? '') == 'submitted')
+        .where((report) => (report.status.toLowerCase()) == 'submitted')
         .toList();
 
     return Scaffold(
