@@ -22,20 +22,24 @@ class _ReportScreenState extends State<ReportScreen> {
   final category = ['Road', 'Foot Bridge', 'Sidewalk', 'Lamp Post'];
   int selectedRadioValue = 1;
   TextEditingController descriptionController = TextEditingController();
+  FocusNode descriptionFocusNode = FocusNode();
   String? _imagePath;
   bool _isImageValid = false;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     _imagePath = widget.imagePath;
-    _validateImage();
+    _isImageValid = _imagePath != null && File(_imagePath!).existsSync();
   }
 
-  void _validateImage() {
-    setState(() {
-      _isImageValid = _imagePath != null && File(_imagePath!).existsSync();
-    });
+  @override
+  void dispose() {
+    descriptionController.dispose();
+    descriptionFocusNode.dispose();
+    _scrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _openCamera() async {
@@ -44,6 +48,16 @@ class _ReportScreenState extends State<ReportScreen> {
       setState(() {
         _imagePath = result;
         _isImageValid = true;
+      });
+
+      // Auto-scroll and focus after insertion
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeOut,
+        );
+        FocusScope.of(context).requestFocus(descriptionFocusNode);
       });
     }
   }
@@ -58,15 +72,14 @@ class _ReportScreenState extends State<ReportScreen> {
       ),
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
+        controller: _scrollController,
         padding: EdgeInsets.all(ScreenUtil().setSp(15)),
         child: Form(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "Classification",
-                style: TextStyle(color: Colors.black54),
-              ),
+              const Text("Classification",
+                  style: TextStyle(color: Colors.black54)),
               SizedBox(height: ScreenUtil().setHeight(10)),
               CustomDropdown(
                 items: category,
@@ -74,30 +87,21 @@ class _ReportScreenState extends State<ReportScreen> {
                 hint: 'Select a category',
               ),
               SizedBox(height: ScreenUtil().setHeight(15)),
-              const Text(
-                "Location",
-                style: TextStyle(color: Colors.black54),
-              ),
+              const Text("Location", style: TextStyle(color: Colors.black54)),
               SizedBox(height: ScreenUtil().setHeight(10)),
               const CustomTextFormField(
                 label: 'Location',
                 hintText: 'Enter location',
               ),
               SizedBox(height: ScreenUtil().setHeight(15)),
-              const Text(
-                "Distance",
-                style: TextStyle(color: Colors.black54),
-              ),
+              const Text("Distance", style: TextStyle(color: Colors.black54)),
               SizedBox(height: ScreenUtil().setHeight(10)),
               const CustomTextFormField(
                 label: 'Distance',
                 hintText: 'Enter distance from location',
               ),
               SizedBox(height: ScreenUtil().setHeight(15)),
-              const Text(
-                "Severity",
-                style: TextStyle(color: Colors.black54),
-              ),
+              const Text("Severity", style: TextStyle(color: Colors.black54)),
               SizedBox(height: ScreenUtil().setHeight(10)),
               CustomRadiobutton(
                 onChanged: (value) {
@@ -109,11 +113,7 @@ class _ReportScreenState extends State<ReportScreen> {
               SizedBox(height: ScreenUtil().setHeight(15)),
               Container(
                 decoration: BoxDecoration(
-                  border: Border.all(
-                    width: 1.5,
-                    style: BorderStyle.solid,
-                    color: Colors.grey.shade400,
-                  ),
+                  border: Border.all(width: 1.5, color: Colors.grey.shade400),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 padding: const EdgeInsets.all(14),
@@ -123,37 +123,30 @@ class _ReportScreenState extends State<ReportScreen> {
                     Text(
                       'Severity Level $selectedRadioValue',
                       style: const TextStyle(
-                        color: COLOR_PRIMARY,
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                      ),
+                          color: COLOR_PRIMARY,
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: ScreenUtil().setHeight(5)),
                     Text(
                       _getSeverityDescription(selectedRadioValue),
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                      ),
+                      style: TextStyle(color: Colors.grey.shade600),
                     ),
                   ],
                 ),
               ),
               SizedBox(height: ScreenUtil().setHeight(20)),
-              const Text(
-                "Description",
-                style: TextStyle(color: Colors.black54),
-              ),
+              const Text("Description",
+                  style: TextStyle(color: Colors.black54)),
               SizedBox(height: ScreenUtil().setHeight(10)),
               CustomTextArea(
                 controller: descriptionController,
                 hintText: "Write your description about the issue here...",
                 maxLines: 4,
+                // Removed focusNode as CustomTextArea does not support it
               ),
               SizedBox(height: ScreenUtil().setHeight(20)),
-              const Text(
-                "Image",
-                style: TextStyle(color: Colors.black54),
-              ),
+              const Text("Image", style: TextStyle(color: Colors.black54)),
               SizedBox(height: ScreenUtil().setHeight(10)),
               GestureDetector(
                 onTap: _openCamera,
@@ -166,7 +159,11 @@ class _ReportScreenState extends State<ReportScreen> {
                       border: Border.all(color: Colors.grey.shade300),
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: _buildImageWidget(),
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 400),
+                      switchInCurve: Curves.easeOutBack,
+                      child: _buildImageWidget(),
+                    ),
                   ),
                 ),
               ),
@@ -197,27 +194,29 @@ class _ReportScreenState extends State<ReportScreen> {
 
   Widget _buildImageWidget() {
     if (_imagePath == null || !File(_imagePath!).existsSync()) {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.camera_alt, size: 50, color: Colors.grey),
-          SizedBox(height: ScreenUtil().setHeight(10)),
-          const Text('Tap to take photo', style: TextStyle(color: Colors.grey)),
-        ],
+      return Container(
+        key: const ValueKey('placeholder'),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.camera_alt, size: 50, color: Colors.grey),
+            SizedBox(height: ScreenUtil().setHeight(10)),
+            const Text('Tap to take photo',
+                style: TextStyle(color: Colors.grey)),
+          ],
+        ),
       );
     }
-
-    try {
-      return Image.file(
+    return Container(
+      key: ValueKey(_imagePath),
+      child: Image.file(
         File(_imagePath!),
         width: double.infinity,
         height: MediaQuery.of(context).size.height * 0.3,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) => _buildErrorWidget(),
-      );
-    } catch (e) {
-      return _buildErrorWidget();
-    }
+      ),
+    );
   }
 
   Widget _buildErrorWidget() {

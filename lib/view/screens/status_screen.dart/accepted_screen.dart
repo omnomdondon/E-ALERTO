@@ -10,10 +10,15 @@ class AcceptedScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final acceptedReports = reports
-        .where((report) => (report.status.toLowerCase() ?? '') == 'accepted')
+        .where((report) => (report.status.toLowerCase()) == 'accepted')
         .toList();
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Accepted'),
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+      ),
       backgroundColor: Colors.white,
       body: acceptedReports.isEmpty
           ? Center(

@@ -14,6 +14,11 @@ class ResolvedScreen extends StatelessWidget {
         .toList();
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Resolved'),
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+      ),
       backgroundColor: Colors.white,
       body: resolvedReports.isEmpty
           ? Center(

@@ -14,6 +14,11 @@ class SubmittedScreen extends StatelessWidget {
         .toList();
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Submitted'),
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+      ),
       backgroundColor: Colors.white,
       body: submittedReports.isEmpty
           ? Center(

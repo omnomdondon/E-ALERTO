@@ -22,9 +22,7 @@ class _CameraScreenState extends State<CameraScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _initializeCamera();
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _initializeCamera());
   }
 
   @override
@@ -40,16 +38,13 @@ class _CameraScreenState extends State<CameraScreen> {
         setState(() => _isLoading = false);
         return;
       }
-
       _controller = CameraController(
         _cameras![_selectedCameraIndex],
         ResolutionPreset.high,
         enableAudio: false,
       );
-
       _initializeControllerFuture = _controller.initialize();
       await _initializeControllerFuture;
-
       if (!mounted) return;
       setState(() {
         _isLoading = false;
@@ -67,35 +62,29 @@ class _CameraScreenState extends State<CameraScreen> {
 
   Future<void> _captureImage() async {
     if (_isTakingPicture || !_isCameraReady) return;
-
     setState(() => _isTakingPicture = true);
-
     try {
       await _initializeControllerFuture;
       final image = await _controller.takePicture();
-
       if (!mounted) return;
       Navigator.of(context).pop(image.path);
     } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to take picture')),
-      );
-    } finally {
       if (mounted) {
-        setState(() => _isTakingPicture = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to take picture')),
+        );
       }
+    } finally {
+      if (mounted) setState(() => _isTakingPicture = false);
     }
   }
 
   Future<void> _switchCamera() async {
     if (_cameras == null || _cameras!.length < 2 || _isTakingPicture) return;
-
     setState(() {
       _isCameraReady = false;
       _selectedCameraIndex = _selectedCameraIndex == 0 ? 1 : 0;
     });
-
     await _controller.dispose();
     await _initializeCamera();
   }
@@ -109,9 +98,7 @@ class _CameraScreenState extends State<CameraScreen> {
           : Stack(
               children: [
                 if (_isCameraReady)
-                  SizedBox.expand(
-                    child: CameraPreview(_controller),
-                  ),
+                  SizedBox.expand(child: CameraPreview(_controller)),
                 Positioned(
                   bottom: ScreenUtil().setHeight(40),
                   left: 0,
@@ -126,11 +113,7 @@ class _CameraScreenState extends State<CameraScreen> {
                               height: ScreenUtil().setWidth(70),
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Colors.transparent,
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 4,
-                                ),
+                                border: Border.all(color: Colors.white, width: 4),
                               ),
                               child: Container(
                                 margin: const EdgeInsets.all(4),
@@ -147,11 +130,9 @@ class _CameraScreenState extends State<CameraScreen> {
                   top: ScreenUtil().setHeight(40),
                   left: ScreenUtil().setWidth(15),
                   child: IconButton(
-                    icon:
-                        const Icon(Icons.close, color: Colors.white, size: 30),
-                    onPressed: _isTakingPicture
-                        ? null
-                        : () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close, color: Colors.white, size: 30),
+                    onPressed:
+                        _isTakingPicture ? null : () => Navigator.of(context).pop(),
                   ),
                 ),
                 Positioned(
@@ -171,21 +152,19 @@ class _CameraScreenState extends State<CameraScreen> {
                                 if (_isCameraReady) {
                                   setState(() => _isFlashOn = !_isFlashOn);
                                   _controller.setFlashMode(
-                                    _isFlashOn
-                                        ? FlashMode.torch
-                                        : FlashMode.off,
+                                    _isFlashOn ? FlashMode.torch : FlashMode.off,
                                   );
                                 }
                               },
                       ),
-                      if (_cameras != null && _cameras!.length > 1)
+                      if (_cameras != null && _cameras!.length > 1) ...[
                         SizedBox(height: ScreenUtil().setHeight(20)),
-                      if (_cameras != null && _cameras!.length > 1)
                         IconButton(
                           icon: const Icon(Icons.cameraswitch,
                               color: Colors.white, size: 30),
                           onPressed: _isTakingPicture ? null : _switchCamera,
                         ),
+                      ],
                     ],
                   ),
                 ),

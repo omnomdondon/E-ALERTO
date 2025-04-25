@@ -1,27 +1,11 @@
 import 'package:e_alerto/controller/router.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
-import 'firebase_options.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-
-  try {
-    debugPrint('Initializing Firebase...');
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    debugPrint('Firebase initialized successfully');
-  } catch (e) {
-    debugPrint('Firebase initialization failed: $e');
-    rethrow;
-  }
-
   runApp(const MainApp());
 }
 
@@ -33,19 +17,12 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
-  late final GoogleSignIn _googleSignIn;
   late final GoRouter _router;
 
   @override
   void initState() {
     super.initState();
-    _googleSignIn = GoogleSignIn(
-      scopes: ['email', 'profile'],
-      clientId: kIsWeb
-          ? '288160619445-qtkmrdjpv67n8gf5ric0kl4it3iqtg44.apps.googleusercontent.com' // Web client ID
-          : DefaultFirebaseOptions.currentPlatform.iosClientId,
-    );
-    _router = createRouter(_googleSignIn);
+    _router = createRouter(); // No longer passes GoogleSignIn
   }
 
   @override
@@ -53,15 +30,12 @@ class _MainAppState extends State<MainApp> {
     return ScreenUtilInit(
       designSize: const Size(360, 690),
       minTextAdapt: true,
-      builder: (_, child) {
-        return MaterialApp.router(
-          routerConfig: _router,
-          color: Colors.white,
-          theme: ThemeData(textTheme: GoogleFonts.workSansTextTheme()),
-          debugShowCheckedModeBanner: false,
-          title: 'E-ALERTO',
-        );
-      },
+      builder: (_, __) => MaterialApp.router(
+        routerConfig: _router,
+        theme: ThemeData(textTheme: GoogleFonts.workSansTextTheme()),
+        debugShowCheckedModeBanner: false,
+        title: 'E-ALERTO',
+      ),
     );
   }
 }

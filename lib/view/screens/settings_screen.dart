@@ -1,12 +1,9 @@
+// settings_screen.dart (Firebase-stripped)
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import '../auth_gate.dart';
 
 class SettingsScreen extends StatefulWidget {
-  final GoogleSignIn googleSignIn;
-
-  const SettingsScreen({super.key, required this.googleSignIn});
+  const SettingsScreen({super.key});
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -17,15 +14,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _logout() async {
     setState(() => _isLoggingOut = true);
-    try {
-      await AuthGate.logout(context, widget.googleSignIn);
-      if (mounted) {
-        // Use goNamed to ensure proper navigation stack reset
-        context.goNamed('login');
-      }
-    } finally {
-      if (mounted) setState(() => _isLoggingOut = false);
+
+    // TODO: Add MongoDB logout logic here
+    await Future.delayed(const Duration(seconds: 1));
+
+    if (mounted) {
+      context.goNamed('login');
     }
+
+    setState(() => _isLoggingOut = false);
   }
 
   Future<void> _confirmLogout() async {
@@ -41,10 +38,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text(
-              'Sign Out',
-              style: TextStyle(color: Colors.red),
-            ),
+            child: const Text('Sign Out', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),

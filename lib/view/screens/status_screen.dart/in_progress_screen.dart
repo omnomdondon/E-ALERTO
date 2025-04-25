@@ -15,6 +15,11 @@ class InProgressScreen extends StatelessWidget {
         .toList();
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('In Progress'),
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+      ),
       backgroundColor: Colors.white,
       body: inProgressReports.isEmpty
           ? Center(

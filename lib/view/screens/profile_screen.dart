@@ -1,118 +1,13 @@
-import 'package:firebase_auth/firebase_auth.dart';
+// profile_screen.dart (Firebase-stripped)
 import 'package:e_alerto/constants.dart';
 import 'package:e_alerto/controller/routes.dart';
 import 'package:e_alerto/view/widgets/post_card.dart';
-import 'package:e_alerto/view/widgets/custom_filledbutton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
-
-  @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
-}
-
-class _ProfileScreenState extends State<ProfileScreen> {
-  final User? user = FirebaseAuth.instance.currentUser;
-  bool isEmailVerified = false;
-  bool isVerificationInProgress = false;
-  bool showVerificationSuccessMessage = false;
-  bool isGoogleUser = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _checkAuthStatus();
-  }
-
-  Future<void> _checkAuthStatus() async {
-    await user?.reload();
-    setState(() {
-      isEmailVerified = user?.emailVerified ?? false;
-      isGoogleUser = user?.providerData
-              .any((userInfo) => userInfo.providerId == 'google.com') ??
-          false;
-    });
-  }
-
-  Future<void> sendVerificationEmail() async {
-    if (user == null) return;
-
-    setState(() {
-      isVerificationInProgress = true;
-    });
-
-    try {
-      await user!.sendEmailVerification();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Verification email sent! Please check your inbox.'),
-          duration: Duration(seconds: 3),
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error sending verification email: $e'),
-          duration: const Duration(seconds: 3),
-        ),
-      );
-    } finally {
-      setState(() {
-        isVerificationInProgress = false;
-      });
-    }
-  }
-
-  Future<void> checkEmailVerification() async {
-    if (user == null) return;
-
-    setState(() {
-      isVerificationInProgress = true;
-    });
-
-    try {
-      await user!.reload();
-      final updatedUser = FirebaseAuth.instance.currentUser;
-      final verified = updatedUser?.emailVerified ?? false;
-
-      setState(() {
-        isEmailVerified = verified;
-        if (verified) {
-          showVerificationSuccessMessage = true;
-          Future.delayed(const Duration(seconds: 3), () {
-            if (mounted) {
-              setState(() {
-                showVerificationSuccessMessage = false;
-              });
-            }
-          });
-        }
-      });
-
-      if (!verified) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Email not yet verified. Please check your inbox.'),
-            duration: Duration(seconds: 3),
-          ),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error checking verification status: $e'),
-          duration: const Duration(seconds: 3),
-        ),
-      );
-    } finally {
-      setState(() {
-        isVerificationInProgress = false;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -136,188 +31,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
             SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.all(ScreenUtil().setSp(15)),
-                child: Column(
+                child: Row(
                   children: [
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 40,
-                          backgroundColor: Colors.grey,
-                          child: isGoogleUser && user?.photoURL != null
-                              ? ClipOval(
-                                  child: Image.network(
-                                    user!.photoURL!,
-                                    width: 80,
-                                    height: 80,
-                                    fit: BoxFit.cover,
-                                  ),
-                                )
-                              : const Icon(
-                                  Icons.person,
-                                  size: 40,
-                                  color: Colors.white,
-                                ),
-                        ),
-                        SizedBox(width: ScreenUtil().setWidth(20)),
-                        Flexible(
-                          flex: 1,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    isGoogleUser
-                                        ? user?.displayName ?? 'Google User'
-                                        : '@${user?.email?.split('@')[0] ?? "user"}',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.black87,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  if (isEmailVerified)
-                                    const Padding(
-                                      padding: EdgeInsets.only(left: 4.0),
-                                      child: Icon(
-                                        Icons.verified,
-                                        color: Colors.blue,
-                                        size: 20,
-                                      ),
-                                    ),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              const Text(
-                                'Edit Profile',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                    const CircleAvatar(
+                      radius: 40,
+                      backgroundColor: Colors.grey,
+                      child: Icon(
+                        Icons.person,
+                        size: 40,
+                        color: Colors.white,
+                      ),
                     ),
-                    if (!isGoogleUser &&
-                        !isEmailVerified &&
-                        !showVerificationSuccessMessage)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: SizedBox(
-                                height: 48, // Fixed height to prevent overflow
-                                child: CustomFilledButton(
-                                  onPressed: isVerificationInProgress
-                                      ? null
-                                      : () async {
-                                          await sendVerificationEmail();
-                                        },
-                                  backgroundColor: COLOR_PRIMARY,
-                                  textColor: Colors.white,
-                                  padding: 12, // Reduced padding to fit content
-                                  child: const FittedBox(
-                                    // Ensures content fits within button
-                                    fit: BoxFit.scaleDown,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      mainAxisSize: MainAxisSize
-                                          .min, // Takes minimum required space
-                                      children: [
-                                        Icon(
-                                          Icons.mark_email_unread,
-                                          size: 18,
-                                          color: COLOR_SECONDARY,
-                                        ),
-                                        SizedBox(width: 8),
-                                        Text(
-                                          'Verify Email',
-                                          overflow: TextOverflow.ellipsis,
-                                          style:
-                                              TextStyle(color: COLOR_SECONDARY),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: SizedBox(
-                                height:
-                                    48, // Fixed height to match first button
-                                child: CustomFilledButton(
-                                  onPressed: isVerificationInProgress
-                                      ? null
-                                      : () async {
-                                          await checkEmailVerification();
-                                        },
-                                  backgroundColor: COLOR_SECONDARY,
-                                  textColor: Colors.black87,
-                                  padding: 12, // Reduced padding to fit content
-                                  child: const FittedBox(
-                                    fit: BoxFit.scaleDown,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(
-                                          Icons.refresh,
-                                          size: 18,
-                                          color: COLOR_PRIMARY,
-                                        ),
-                                        SizedBox(width: 8),
-                                        Text(
-                                          'Check Status',
-                                          overflow: TextOverflow.ellipsis,
-                                          style:
-                                              TextStyle(color: COLOR_PRIMARY),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                    SizedBox(width: ScreenUtil().setWidth(20)),
+                    const Expanded(
+                      child: Text(
+                        '@username',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black87,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    if (showVerificationSuccessMessage)
-                      Container(
-                        width: double.infinity,
-                        margin: const EdgeInsets.only(top: 16),
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 12, horizontal: 16),
-                        decoration: BoxDecoration(
-                          color: Colors.green,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.check, color: Colors.white),
-                            SizedBox(width: 8),
-                            Text(
-                              'Email Verified Successfully!',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    if (isVerificationInProgress)
-                      const Padding(
-                        padding: EdgeInsets.only(top: 8.0),
-                        child: CircularProgressIndicator(),
-                      ),
+                    ),
                   ],
                 ),
               ),
@@ -328,14 +63,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const TabBar(
                   indicatorColor: COLOR_PRIMARY,
                   indicatorSize: TabBarIndicatorSize.tab,
-                  unselectedLabelColor: Colors.black54,
-                  indicator: BoxDecoration(
-                    color: COLOR_SECONDARY,
-                    border: Border(
-                      bottom: BorderSide(color: COLOR_PRIMARY, width: 1),
-                    ),
-                  ),
                   labelColor: COLOR_PRIMARY,
+                  unselectedLabelColor: Colors.black54,
                   tabs: [
                     Tab(text: 'My Reports'),
                     Tab(text: 'To Rate'),
@@ -345,14 +74,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
           ],
-          body: const Expanded(
-            child: TabBarView(
-              children: [
-                MyReportsTab(),
-                ToRateTab(),
-                HistoryTab(),
-              ],
-            ),
+          body: const TabBarView(
+            children: [
+              MyReportsTab(),
+              ToRateTab(),
+              HistoryTab(),
+            ],
           ),
         ),
       ),
@@ -362,8 +89,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 class _TabBarDelegate extends SliverPersistentHeaderDelegate {
   final TabBar tabBar;
-
-  _TabBarDelegate(this.tabBar);
+  const _TabBarDelegate(this.tabBar);
 
   @override
   double get minExtent => tabBar.preferredSize.height;
@@ -394,15 +120,14 @@ class MyReportsTab extends StatelessWidget {
       padding: EdgeInsets.all(ScreenUtil().setSp(15)),
       children: const [
         PostCard(
-          reportNumber: '2',
-          classification: 'Deteriorated Parking',
-          location: '106 Mendiola St.',
+          reportNumber: '1',
+          classification: 'Cracked Road',
+          location: 'Sample Location',
           status: 'In Progress',
-          date: '3/1/2025',
-          username: '@juan_dcruz',
-          description:
-              'The surface of the public parking lot on 106 Mendiola Street is severely deteriorated, with large potholes and uneven surfaces.',
-          image: '/assets/images/image2.png',
+          date: '1/1/2025',
+          username: '@user',
+          description: 'This is a sample report',
+          image: '/assets/images/image1.png',
         ),
       ],
     );
@@ -419,14 +144,13 @@ class ToRateTab extends StatelessWidget {
       children: const [
         PostCard(
           reportNumber: '2',
-          classification: 'Uneven Pavement',
-          location: '128 Panay Ave. QC',
+          classification: 'Damaged Signage',
+          location: 'Another Location',
           status: 'Resolved',
           date: '2/2/2025',
-          username: '@juan_dcruz',
-          description:
-              'The surface of this pavement is uneven making it prone for accidents to the citizens',
-          image: '/assets/images/image7.png',
+          username: '@user',
+          description: 'Needs replacement',
+          image: '/assets/images/image2.png',
           rate: true,
         ),
       ],
@@ -443,15 +167,14 @@ class HistoryTab extends StatelessWidget {
       padding: EdgeInsets.all(ScreenUtil().setSp(15)),
       children: const [
         PostCard(
-          reportNumber: '2',
-          classification: 'Dim Street Lamp',
-          location: '1110 Lacson St.',
+          reportNumber: '3',
+          classification: 'Street Light Issue',
+          location: 'Third Street',
           status: 'Rated',
-          date: '2/29/2025',
-          username: '@juan_dcruz',
-          description:
-              'The lamp in this street is always dim, it seems that it has been a while since it was last replaced',
-          image: '/assets/images/image8.png',
+          date: '3/3/2025',
+          username: '@user',
+          description: 'Light is flickering at night',
+          image: '/assets/images/image3.png',
         ),
       ],
     );
