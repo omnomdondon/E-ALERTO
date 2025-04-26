@@ -57,10 +57,10 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
             ),
-            SliverPersistentHeader(
+            const SliverPersistentHeader(
               pinned: true,
               delegate: _TabBarDelegate(
-                const TabBar(
+                TabBar(
                   indicatorColor: COLOR_PRIMARY,
                   indicatorSize: TabBarIndicatorSize.tab,
                   labelColor: COLOR_PRIMARY,
