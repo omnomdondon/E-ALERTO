@@ -1,6 +1,7 @@
-// settings_screen.dart (Firebase-stripped)
+// settings_screen.dart (MongoDB logout-ready!)
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:e_alerto/controller/auth_service.dart'; // 🆕 Import AuthService
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -15,11 +16,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _logout() async {
     setState(() => _isLoggingOut = true);
 
-    // TODO: Add MongoDB logout logic here
-    await Future.delayed(const Duration(seconds: 1));
+    // 🧹 Clear stored token and username
+    await AuthService.logout();
 
     if (mounted) {
-      context.goNamed('login');
+      context.goNamed('login'); // Redirect to login screen
     }
 
     setState(() => _isLoggingOut = false);

@@ -1,0 +1,33 @@
+{
+  "name": "e-alerto",
+  "version": "1.0.0",
+  "description": "A new Flutter project.",
+  "main": "backend/server.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "start": "nodemon backend/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/omnomdondon/E-ALERTO.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/omnomdondon/E-ALERTO/issues"
+  },
+  "homepage": "https://github.com/omnomdondon/E-ALERTO#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "google-auth-library": "^9.15.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.14.0"
+  }
+}

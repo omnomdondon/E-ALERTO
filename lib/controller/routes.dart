@@ -10,8 +10,7 @@ class Routes {
 
   // Main app routes
   static const String homePage = '/home';
-  static const String detailPage = 'detail';
-  static const String homeDetail = '$homePage/detail';
+  static const String homeDetail = 'detail'; // <- Just "detail"
 
   // Feature routes
   static const String searchPage = '/search';
@@ -22,8 +21,8 @@ class Routes {
 
   // Profile routes
   static const String profilePage = '/profile';
-  static const String ratingPage = 'rating';
   static const String settingsPage = 'settings';
-  static const String profileRating = '$profilePage/rating';
+  static const String ratingPage = 'rating';
   static const String profileSettings = '$profilePage/settings';
+  static const String profileRating = '$profilePage/rating';
 }

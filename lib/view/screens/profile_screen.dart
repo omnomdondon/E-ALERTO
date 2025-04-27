@@ -1,95 +1,136 @@
-// profile_screen.dart (Firebase-stripped)
 import 'package:e_alerto/constants.dart';
+import 'package:e_alerto/controller/auth_service.dart';
 import 'package:e_alerto/controller/routes.dart';
 import 'package:e_alerto/view/widgets/post_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings_outlined, size: 24),
-            onPressed: () => context.push(Routes.profileSettings),
-          ),
-        ],
-      ),
-      backgroundColor: Colors.white,
-      body: DefaultTabController(
-        length: 3,
-        child: NestedScrollView(
-          headerSliverBuilder: (context, innerBoxIsScrolled) => [
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.all(ScreenUtil().setSp(15)),
-                child: Row(
-                  children: [
-                    const CircleAvatar(
-                      radius: 40,
-                      backgroundColor: Colors.grey,
-                      child: Icon(
-                        Icons.person,
-                        size: 40,
-                        color: Colors.white,
-                      ),
-                    ),
-                    SizedBox(width: ScreenUtil().setWidth(20)),
-                    const Expanded(
-                      child: Text(
-                        '@username',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.black87,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SliverPersistentHeader(
-              pinned: true,
-              delegate: _TabBarDelegate(
-                TabBar(
-                  indicatorColor: COLOR_PRIMARY,
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  labelColor: COLOR_PRIMARY,
-                  unselectedLabelColor: Colors.black54,
-                  tabs: [
-                    Tab(text: 'My Reports'),
-                    Tab(text: 'To Rate'),
-                    Tab(text: 'History'),
-                  ],
-                ),
-              ),
-            ),
-          ],
-          body: const TabBarView(
-            children: [
-              MyReportsTab(),
-              ToRateTab(),
-              HistoryTab(),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
+class _ProfileScreenState extends State<ProfileScreen> {
+  String username = 'Loading...'; // Default until fetched
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUsername();
+  }
+
+  Future<void> _fetchUsername() async {
+    final fetchedUsername = await AuthService.getUsername();
+    if (mounted) {
+      setState(() {
+        username = fetchedUsername ?? 'Unknown';
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(
+          title: const Text('Profile'),
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.white,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.settings_outlined, size: 24),
+              onPressed: () => context.push(Routes.profileSettings),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.white,
+        body: DefaultTabController(
+          length: 3,
+          child: NestedScrollView(
+            headerSliverBuilder: (context, innerBoxIsScrolled) => [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.all(ScreenUtil().setSp(15)),
+                  child: Row(
+                    children: [
+                      const CircleAvatar(
+                        radius: 40,
+                        backgroundColor: Colors.grey,
+                        child: Icon(
+                          Icons.person,
+                          size: 40,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(width: ScreenUtil().setWidth(20)),
+                      Flexible(
+                        flex: 1,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '@$username',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.black87,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const Text(
+                              'Edit Profile',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: _TabBarDelegate(
+                  const TabBar(
+                    indicatorColor: COLOR_PRIMARY,
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    unselectedLabelColor: Colors.black54,
+                    indicator: BoxDecoration(
+                      color: COLOR_SECONDARY,
+                      border: Border(
+                        bottom: BorderSide(color: COLOR_PRIMARY, width: 1),
+                      ),
+                    ),
+                    labelColor: COLOR_PRIMARY,
+                    tabs: [
+                      Tab(text: 'My Reports'),
+                      Tab(text: 'To Rate'),
+                      Tab(text: 'History'),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+            body: TabBarView(
+              children: [
+                MyReportsTab(username: username),
+                ToRateTab(username: username),
+                HistoryTab(username: username),
+              ],
+            ),
+          ),
+        ),
+      );
+}
+
+// Custom sticky TabBar delegate
 class _TabBarDelegate extends SliverPersistentHeaderDelegate {
   final TabBar tabBar;
-  const _TabBarDelegate(this.tabBar);
+
+  _TabBarDelegate(this.tabBar);
 
   @override
   double get minExtent => tabBar.preferredSize.height;
@@ -111,23 +152,35 @@ class _TabBarDelegate extends SliverPersistentHeaderDelegate {
   }
 }
 
+// Tabs
 class MyReportsTab extends StatelessWidget {
-  const MyReportsTab({super.key});
+  final String username;
+  const MyReportsTab({super.key, required this.username});
 
   @override
   Widget build(BuildContext context) {
     return ListView(
       padding: EdgeInsets.all(ScreenUtil().setSp(15)),
-      children: const [
+      children: [
         PostCard(
           reportNumber: '1',
-          classification: 'Cracked Road',
-          location: 'Sample Location',
+          classification: 'Pothole',
+          location: 'Main Street',
           status: 'In Progress',
-          date: '1/1/2025',
-          username: '@user',
-          description: 'This is a sample report',
-          image: '/assets/images/image1.png',
+          date: '01/01/2025',
+          username: '@$username',
+          description: 'Huge pothole blocking the road.',
+          image: 'assets/images/image1.png',
+        ),
+        PostCard(
+          reportNumber: '2',
+          classification: 'Broken Sign',
+          location: '2nd Avenue',
+          status: 'Accepted',
+          date: '02/01/2025',
+          username: '@$username',
+          description: 'Dangerous signage has fallen.',
+          image: 'assets/images/image2.png',
         ),
       ],
     );
@@ -135,48 +188,48 @@ class MyReportsTab extends StatelessWidget {
 }
 
 class ToRateTab extends StatelessWidget {
-  const ToRateTab({super.key});
+  final String username;
+  const ToRateTab({super.key, required this.username});
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
+    return ListView.builder(
       padding: EdgeInsets.all(ScreenUtil().setSp(15)),
-      children: const [
-        PostCard(
-          reportNumber: '2',
-          classification: 'Damaged Signage',
-          location: 'Another Location',
-          status: 'Resolved',
-          date: '2/2/2025',
-          username: '@user',
-          description: 'Needs replacement',
-          image: '/assets/images/image2.png',
-          rate: true,
-        ),
-      ],
+      itemCount: 3,
+      itemBuilder: (context, index) => PostCard(
+        rate: true,
+        reportNumber: '${index + 1}',
+        classification: 'Incident ${index + 1}',
+        location: 'Random Location',
+        status: 'Resolved',
+        date: '02/02/2025',
+        username: '@$username',
+        description: 'Sample description of report to rate.',
+        image: 'assets/images/image2.png',
+      ),
     );
   }
 }
 
 class HistoryTab extends StatelessWidget {
-  const HistoryTab({super.key});
+  final String username;
+  const HistoryTab({super.key, required this.username});
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
+    return ListView.builder(
       padding: EdgeInsets.all(ScreenUtil().setSp(15)),
-      children: const [
-        PostCard(
-          reportNumber: '3',
-          classification: 'Street Light Issue',
-          location: 'Third Street',
-          status: 'Rated',
-          date: '3/3/2025',
-          username: '@user',
-          description: 'Light is flickering at night',
-          image: '/assets/images/image3.png',
-        ),
-      ],
+      itemCount: 4,
+      itemBuilder: (context, index) => PostCard(
+        reportNumber: '${index + 1}',
+        classification: 'Resolved Case ${index + 1}',
+        location: 'Historical Place',
+        status: 'Rated',
+        date: '03/03/2025',
+        username: '@$username',
+        description: 'Sample description of completed report.',
+        image: 'assets/images/image3.png',
+      ),
     );
   }
 }

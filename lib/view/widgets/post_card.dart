@@ -91,7 +91,7 @@ class _PostCardState extends State<PostCard> {
               extra: {'image': widget.image},
             )
           : context.push(
-              '${Routes.homeDetail}?reportNumber=${widget.reportNumber}'
+              '${Routes.homePage}/${Routes.homeDetail}?reportNumber=${widget.reportNumber}'
               '&classification=${widget.classification}'
               '&location=${widget.location}'
               '&status=${widget.status}'
@@ -100,142 +100,142 @@ class _PostCardState extends State<PostCard> {
               '&description=${widget.description}',
               extra: {'image': widget.image},
             ),
-      child: Card(
-        color: const Color.fromARGB(255, 246, 246, 246),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-        margin: EdgeInsets.fromLTRB(0, 0, 0, ScreenUtil().setSp(15)),
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-              ScreenUtil().setSp(15), 8, ScreenUtil().setSp(15), 0),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    child: Text(
-                      widget.classification,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.black,
+      child: Hero(
+        tag: widget.reportNumber,
+        child: Card(
+          color: const Color.fromARGB(255, 246, 246, 246),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+          margin: EdgeInsets.fromLTRB(0, 0, 0, ScreenUtil().setSp(15)),
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(
+                ScreenUtil().setSp(15), 8, ScreenUtil().setSp(15), 0),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        widget.classification,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                        ),
                       ),
                     ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: getStatusColor(widget.status),
-                      minimumSize: Size(ScreenUtil().setWidth(100),
-                          ScreenUtil().setHeight(25)),
-                      maximumSize: Size(ScreenUtil().setWidth(120),
-                          ScreenUtil().setHeight(40)),
-                    ),
-                    child: Text(
-                      widget.status,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.white,
+                    ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: getStatusColor(widget.status),
+                        minimumSize: Size(ScreenUtil().setWidth(100),
+                            ScreenUtil().setHeight(25)),
+                      ),
+                      child: Text(
+                        widget.status,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Flexible(
-                    child: Text(
-                      widget.location,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.black,
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        widget.location,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.black,
+                        ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 5, 0),
-                    child: Text(
-                      widget.date,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.black,
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 0, 5, 0),
+                      child: Text(
+                        widget.date,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.black,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Flexible(
-                    child: Text(
-                      widget.username,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade600,
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        widget.username,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(height: ScreenUtil().setHeight(5)),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Flexible(
-                    child: Text(
-                      widget.description,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade600,
+                  ],
+                ),
+                SizedBox(height: ScreenUtil().setHeight(5)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        widget.description,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton.icon(
-                    onPressed: () {
-                      vote(1);
-                    },
-                    icon: Icon(
-                      Icons.arrow_circle_up,
-                      size: 20,
-                      color:
-                          userVote == 1 ? COLOR_PRIMARY : Colors.grey.shade400,
-                    ),
-                    label: Text(
-                      totalVote.toString(),
-                      style: TextStyle(
-                        color: userVote == 1 || userVote == -1
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton.icon(
+                      onPressed: () => vote(1),
+                      icon: Icon(
+                        Icons.arrow_circle_up,
+                        size: 20,
+                        color: userVote == 1
                             ? COLOR_PRIMARY
                             : Colors.grey.shade400,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
+                      ),
+                      label: Text(
+                        totalVote.toString(),
+                        style: TextStyle(
+                          color: userVote == 1 || userVote == -1
+                              ? COLOR_PRIMARY
+                              : Colors.grey.shade400,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
                       ),
                     ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      vote(-1);
-                    },
-                    icon: const Icon(Icons.arrow_circle_down),
-                    style: IconButton.styleFrom(
-                      foregroundColor:
-                          userVote == -1 ? COLOR_PRIMARY : Colors.grey.shade400,
-                      iconSize: 20,
+                    IconButton(
+                      onPressed: () => vote(-1),
+                      icon: const Icon(Icons.arrow_circle_down),
+                      style: IconButton.styleFrom(
+                        foregroundColor: userVote == -1
+                            ? COLOR_PRIMARY
+                            : Colors.grey.shade400,
+                        iconSize: 20,
+                      ),
                     ),
-                  )
-                ],
-              )
-            ],
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),

@@ -1,0 +1,4 @@
+username: e_alerto
+password: HcZkgeCGBrPUpIop
+
+mongodb+srv://e_alerto:HcZkgeCGBrPUpIop@e-alerto.7rzhvko.mongodb.net/
