@@ -97,8 +97,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: _emailController,
                     inputType: TextInputType.emailAddress,
                     validator: (value) {
-                      if (value == null || value.isEmpty)
+                      if (value == null || value.isEmpty) {
                         return 'Please enter your email';
+                      }
                       return null;
                     },
                   ),
@@ -119,8 +120,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           setState(() => _obscurePassword = !_obscurePassword),
                     ),
                     validator: (value) {
-                      if (value == null || value.isEmpty)
+                      if (value == null || value.isEmpty) {
                         return 'Please enter your password';
+                      }
                       return null;
                     },
                   ),

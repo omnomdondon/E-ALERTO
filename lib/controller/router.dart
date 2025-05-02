@@ -24,30 +24,32 @@ GoRouter createRouter() {
     navigatorKey: _rootNavigatorKey,
     initialLocation: Routes.loginPage,
     routes: [
-      // Login
+      // Login Screen
       GoRoute(
         path: Routes.loginPage,
         name: 'login',
+        parentNavigatorKey: _rootNavigatorKey,
         pageBuilder: (context, state) =>
             const MaterialPage(child: LoginScreen()),
       ),
 
-      // Registration
+      // Registration Screen
       GoRoute(
         path: Routes.registrationPage,
         name: 'registration',
+        parentNavigatorKey: _rootNavigatorKey,
         pageBuilder: (context, state) =>
             const MaterialPage(child: RegistrationScreen()),
       ),
 
-      // Main App Shell
+      // Main App Shell (Navigation starts after login)
       StatefulShellRoute.indexedStack(
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state, navigationShell) {
           return LayoutScaffold(navigationShell: navigationShell);
         },
         branches: [
-          // 🏠 Home Branch
+          // Home
           StatefulShellBranch(
             navigatorKey: _shellNavigatorKey,
             routes: [
@@ -58,7 +60,7 @@ GoRouter createRouter() {
                     const MaterialPage(child: HomeScreen()),
                 routes: [
                   GoRoute(
-                    path: Routes.homeDetail, // Fix here: Use string directly
+                    path: Routes.homeDetail,
                     name: 'homeDetail',
                     pageBuilder: (context, state) {
                       final params = state.uri.queryParameters;
@@ -89,7 +91,7 @@ GoRouter createRouter() {
             ],
           ),
 
-          // 🔎 Search Branch
+          // Search
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -101,7 +103,7 @@ GoRouter createRouter() {
             ],
           ),
 
-          // 📝 Report Branch
+          // Report
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -125,7 +127,7 @@ GoRouter createRouter() {
             ],
           ),
 
-          // 🔔 Notifications Branch
+          // Notifications
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -137,7 +139,7 @@ GoRouter createRouter() {
             ],
           ),
 
-          // 👤 Profile Branch
+          // Profile
           StatefulShellBranch(
             routes: [
               GoRoute(

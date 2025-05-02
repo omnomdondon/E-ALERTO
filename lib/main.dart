@@ -1,11 +1,13 @@
-import 'package:e_alerto/controller/router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:e_alerto/controller/router.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: "backend/.env");
   runApp(const MainApp());
 }
 
@@ -22,7 +24,7 @@ class _MainAppState extends State<MainApp> {
   @override
   void initState() {
     super.initState();
-    _router = createRouter(); // No longer passes GoogleSignIn
+    _router = createRouter();
   }
 
   @override
@@ -32,7 +34,9 @@ class _MainAppState extends State<MainApp> {
       minTextAdapt: true,
       builder: (_, __) => MaterialApp.router(
         routerConfig: _router,
-        theme: ThemeData(textTheme: GoogleFonts.workSansTextTheme()),
+        theme: ThemeData(
+          textTheme: GoogleFonts.workSansTextTheme(),
+        ),
         debugShowCheckedModeBanner: false,
         title: 'E-ALERTO',
       ),

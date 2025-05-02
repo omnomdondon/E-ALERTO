@@ -51,6 +51,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         );
       }
     }
+    print("📨 Submitting registration for ${_emailController.text}");
   }
 
   Future<void> _googleSignUp() async {
@@ -189,8 +190,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           _obscureConfirmPassword = !_obscureConfirmPassword),
                     ),
                     validator: (value) {
-                      if (_confirmPasswordError != null)
+                      if (_confirmPasswordError != null) {
                         return _confirmPasswordError;
+                      }
                       return _inputController.confirmPass(
                           value, _passwordController.text);
                     },
