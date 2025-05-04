@@ -9,10 +9,6 @@ class ResolvedScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final resolvedReports = reports
-        .where((report) => (report.status.toLowerCase()) == 'resolved')
-        .toList();
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Resolved'),
@@ -20,7 +16,7 @@ class ResolvedScreen extends StatelessWidget {
         surfaceTintColor: Colors.white,
       ),
       backgroundColor: Colors.white,
-      body: resolvedReports.isEmpty
+      body: reports.isEmpty
           ? Center(
               child: Text(
                 'No resolved reports',
@@ -32,8 +28,8 @@ class ResolvedScreen extends StatelessWidget {
             )
           : ListView.builder(
               padding: EdgeInsets.all(ScreenUtil().setSp(15)),
-              itemCount: resolvedReports.length,
-              itemBuilder: (context, index) => resolvedReports[index],
+              itemCount: reports.length,
+              itemBuilder: (context, index) => reports[index],
             ),
     );
   }

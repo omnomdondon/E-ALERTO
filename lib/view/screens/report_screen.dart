@@ -1,37 +1,74 @@
 import 'dart:io';
-import 'package:e_alerto/constants.dart';
+import 'dart:typed_data';
 import 'package:e_alerto/controller/routes.dart';
-import 'package:e_alerto/view/widgets/custom_dropdownmenu.dart';
 import 'package:e_alerto/view/widgets/custom_filledbutton.dart';
-import 'package:e_alerto/view/widgets/custom_radiobutton.dart';
-import 'package:e_alerto/view/widgets/custom_textarea.dart';
-import 'package:e_alerto/view/widgets/custom_textformfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ReportScreen extends StatefulWidget {
   final String? imagePath;
-  const ReportScreen({super.key, this.imagePath});
+  final List<Map<String, dynamic>>? detections;
+  final Uint8List? outputImage;
+  final Position? location;
+  final String? address;
+
+  const ReportScreen({
+    super.key,
+    this.imagePath,
+    this.detections,
+    this.outputImage,
+    this.location,
+    this.address,
+  });
 
   @override
   State<ReportScreen> createState() => _ReportScreenState();
 }
 
 class _ReportScreenState extends State<ReportScreen> {
-  final category = ['Road', 'Foot Bridge', 'Sidewalk', 'Lamp Post'];
-  int selectedRadioValue = 1;
-  TextEditingController descriptionController = TextEditingController();
-  FocusNode descriptionFocusNode = FocusNode();
+  List<Map<String, dynamic>>? _detections;
+  Uint8List? _outputImage;
+  Position? _location;
+  String? _address;
   String? _imagePath;
   bool _isImageValid = false;
   final ScrollController _scrollController = ScrollController();
+  final TextEditingController descriptionController = TextEditingController();
+  final FocusNode descriptionFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     _imagePath = widget.imagePath;
     _isImageValid = _imagePath != null && File(_imagePath!).existsSync();
+    _detections = widget.detections;
+    _outputImage = widget.outputImage;
+    _location = widget.location;
+    _address = widget.address;
+
+    if (_imagePath != null) {
+      final imageFileName = File(_imagePath!).uri.pathSegments.last;
+      print("📸 Image File: $imageFileName");
+    }
+
+    if (_detections != null && _detections!.isNotEmpty) {
+      for (final detection in _detections!) {
+        final label = detection['label'];
+        final confidence = detection['confidence'];
+        print(
+            "🏷️ Label: $label | Confidence: ${(confidence * 100).toStringAsFixed(2)}%");
+      }
+    }
+
+    if (_address != null) {
+      print("📍 Address: $_address");
+    } else if (_location != null) {
+      print("🌐 Coordinates: ${_location!.latitude}, ${_location!.longitude}");
+    }
   }
 
   @override
@@ -50,7 +87,6 @@ class _ReportScreenState extends State<ReportScreen> {
         _isImageValid = true;
       });
 
-      // Auto-scroll and focus after insertion
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
@@ -59,6 +95,63 @@ class _ReportScreenState extends State<ReportScreen> {
         );
         FocusScope.of(context).requestFocus(descriptionFocusNode);
       });
+    }
+  }
+
+  Future<void> _submitReport() async {
+    final uri = Uri.parse("http://192.168.100.121:3000/api/reports");
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      if (token == null) {
+        print("🚫 No auth token found.");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('You must be logged in to submit a report.')),
+        );
+        return;
+      }
+
+      final request = http.MultipartRequest('POST', uri);
+      request.headers['Authorization'] = 'Bearer $token';
+
+      if (_imagePath != null) {
+        request.files
+            .add(await http.MultipartFile.fromPath('image_file', _imagePath!));
+      }
+
+      request.fields['classification'] =
+          _detections != null && _detections!.isNotEmpty
+              ? _detections![0]['label']
+              : 'Unknown';
+      request.fields['measurement'] = 'No measurements'; // Placeholder
+      request.fields['location'] = _address ??
+          (_location != null
+              ? "${_location!.latitude}, ${_location!.longitude}"
+              : "Unknown");
+      request.fields['timestamp'] = DateTime.now().toIso8601String();
+      request.fields['description'] = descriptionController.text;
+
+      final response = await request.send();
+
+      if (response.statusCode == 201) {
+        if (!mounted) return;
+        context.go(Routes.homePage);
+      } else {
+        final responseBody = await response.stream.bytesToString();
+        print('❌ Failed to submit: ${response.reasonPhrase}');
+        print(responseBody);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to submit report')),
+        );
+      }
+    } catch (e) {
+      print("🚨 Submission error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
     }
   }
 
@@ -78,76 +171,8 @@ class _ReportScreenState extends State<ReportScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text("Classification",
-                  style: TextStyle(color: Colors.black54)),
-              SizedBox(height: ScreenUtil().setHeight(10)),
-              CustomDropdown(
-                items: category,
-                onChanged: (value) {},
-                hint: 'Select a category',
-              ),
-              SizedBox(height: ScreenUtil().setHeight(15)),
-              const Text("Location", style: TextStyle(color: Colors.black54)),
-              SizedBox(height: ScreenUtil().setHeight(10)),
-              const CustomTextFormField(
-                label: 'Location',
-                hintText: 'Enter location',
-              ),
-              SizedBox(height: ScreenUtil().setHeight(15)),
-              const Text("Distance", style: TextStyle(color: Colors.black54)),
-              SizedBox(height: ScreenUtil().setHeight(10)),
-              const CustomTextFormField(
-                label: 'Distance',
-                hintText: 'Enter distance from location',
-              ),
-              SizedBox(height: ScreenUtil().setHeight(15)),
-              const Text("Severity", style: TextStyle(color: Colors.black54)),
-              SizedBox(height: ScreenUtil().setHeight(10)),
-              CustomRadiobutton(
-                onChanged: (value) {
-                  setState(() {
-                    selectedRadioValue = value;
-                  });
-                },
-              ),
-              SizedBox(height: ScreenUtil().setHeight(15)),
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(width: 1.5, color: Colors.grey.shade400),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                padding: const EdgeInsets.all(14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Severity Level $selectedRadioValue',
-                      style: const TextStyle(
-                          color: COLOR_PRIMARY,
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: ScreenUtil().setHeight(5)),
-                    Text(
-                      _getSeverityDescription(selectedRadioValue),
-                      style: TextStyle(color: Colors.grey.shade600),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: ScreenUtil().setHeight(20)),
-              const Text("Description",
-                  style: TextStyle(color: Colors.black54)),
-              SizedBox(height: ScreenUtil().setHeight(10)),
-              CustomTextArea(
-                controller: descriptionController,
-                hintText: "Write your description about the issue here...",
-                maxLines: 4,
-                // Removed focusNode as CustomTextArea does not support it
-              ),
-              SizedBox(height: ScreenUtil().setHeight(20)),
               const Text("Image", style: TextStyle(color: Colors.black54)),
-              SizedBox(height: ScreenUtil().setHeight(10)),
+              SizedBox(height: 10.h),
               GestureDetector(
                 onTap: _openCamera,
                 child: ClipRRect(
@@ -161,26 +186,60 @@ class _ReportScreenState extends State<ReportScreen> {
                     ),
                     child: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 400),
-                      switchInCurve: Curves.easeOutBack,
                       child: _buildImageWidget(),
                     ),
                   ),
                 ),
               ),
-              SizedBox(height: ScreenUtil().setHeight(20)),
+              SizedBox(height: 20.h),
+              const Text("Classification",
+                  style: TextStyle(color: Colors.black54)),
+              if (_detections != null && _detections!.isNotEmpty)
+                ..._detections!.map((d) => Text(
+                      "${d['label']} (${((d['confidence'] ?? 0) * 100).toStringAsFixed(1)}%)",
+                      style: const TextStyle(color: Colors.black87),
+                    ))
+              else
+                const Text("No detections found",
+                    style: TextStyle(color: Colors.black54)),
+              SizedBox(height: 10.h),
+              const Text("Location", style: TextStyle(color: Colors.black54)),
+              Text(
+                _address ??
+                    (_location != null
+                        ? "${_location!.latitude}, ${_location!.longitude}"
+                        : "Location not found"),
+                style: const TextStyle(color: Colors.black87),
+              ),
+              SizedBox(height: 15.h),
+              const Text("Measurement",
+                  style: TextStyle(color: Colors.black54)),
+              const Text("No measurements found",
+                  style: TextStyle(color: Colors.black87)),
+              SizedBox(height: 15.h),
+              const Text("Description",
+                  style: TextStyle(color: Colors.black54)),
+              TextFormField(
+                controller: descriptionController,
+                focusNode: descriptionFocusNode,
+                maxLines: 5,
+                decoration: const InputDecoration(
+                  hintText: 'Describe the issue here...',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 20.h),
               CustomFilledButton(
                 text: 'Submit',
                 onPressed: () {
                   if (!_isImageValid) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Please take a photo first'),
-                        duration: Duration(seconds: 2),
-                      ),
+                          content: Text('Please take a photo first')),
                     );
                     return;
                   }
-                  // Handle submission with _imagePath
+                  _submitReport();
                 },
                 fullWidth: true,
               ),
@@ -193,30 +252,25 @@ class _ReportScreenState extends State<ReportScreen> {
   }
 
   Widget _buildImageWidget() {
-    if (_imagePath == null || !File(_imagePath!).existsSync()) {
-      return Container(
-        key: const ValueKey('placeholder'),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.camera_alt, size: 50, color: Colors.grey),
-            SizedBox(height: ScreenUtil().setHeight(10)),
-            const Text('Tap to take photo',
-                style: TextStyle(color: Colors.grey)),
-          ],
-        ),
-      );
-    }
-    return Container(
-      key: ValueKey(_imagePath),
-      child: Image.file(
-        File(_imagePath!),
+    if (_outputImage != null) {
+      return Image.memory(
+        _outputImage!,
+        key: const ValueKey('processedImage'),
         width: double.infinity,
         height: MediaQuery.of(context).size.height * 0.3,
         fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => _buildErrorWidget(),
-      ),
-    );
+      );
+    }
+    return _imagePath != null
+        ? Image.file(
+            File(_imagePath!),
+            key: ValueKey(_imagePath),
+            width: double.infinity,
+            height: MediaQuery.of(context).size.height * 0.3,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => _buildErrorWidget(),
+          )
+        : const SizedBox();
   }
 
   Widget _buildErrorWidget() {
@@ -224,35 +278,11 @@ class _ReportScreenState extends State<ReportScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const Icon(Icons.error_outline, size: 50, color: Colors.red),
-        SizedBox(height: ScreenUtil().setHeight(10)),
+        const SizedBox(height: 10),
         const Text('Failed to load image', style: TextStyle(color: Colors.red)),
-        SizedBox(height: ScreenUtil().setHeight(10)),
-        TextButton(
-          onPressed: _openCamera,
-          child: const Text('Retake Photo'),
-        ),
+        const SizedBox(height: 10),
+        TextButton(onPressed: _openCamera, child: const Text('Retake Photo')),
       ],
     );
-  }
-
-  String _getSeverityDescription(int value) {
-    switch (value) {
-      case 1:
-        return "Minimal impact, barely noticeable.";
-      case 2:
-        return "Minor issue, no major consequences.";
-      case 3:
-        return "Moderate severity, some disruptions.";
-      case 4:
-        return "Significant issue, requires attention.";
-      case 5:
-        return "High severity, potential risk involved.";
-      case 6:
-        return "Critical condition, urgent action needed.";
-      case 7:
-        return "Severe emergency, immediate response required!";
-      default:
-        return "Select a severity level.";
-    }
   }
 }

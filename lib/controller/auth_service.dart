@@ -15,43 +15,50 @@ class AuthService {
     scopes: ['email', 'profile'],
   );
 
-  static Future<bool> register(
-    String email,
-    String username,
-    String password,
-    String fullName,
-  ) async {
+  static Future<bool> register(String email, String username, String password,
+      String fullName, String phone) async {
     final url = Uri.parse('$baseUrl/register');
     try {
-      final response = await http
-          .post(
-            url,
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({
-              'email': email,
-              'username': username,
-              'password': password,
-              'full_name': fullName,
-            }),
-          )
-          .timeout(const Duration(seconds: 10));
-
-      print("✅ Server response: ${response.statusCode}");
-      print("✅ Response body: ${response.body}");
-
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': email,
+          'username': username,
+          'password': password,
+          'full_name': fullName,
+          'phone': phone,
+        }),
+      );
       final data = jsonDecode(response.body);
-      if (response.statusCode == 201 && data['success'] == true) {
-        return true;
-      } else {
-        print('Registration error: ${data['message']}');
-        return false;
-      }
-    } catch (e, stacktrace) {
+      return response.statusCode == 201 && data['success'] == true;
+    } catch (e) {
       print('Registration error: $e');
-      print(stacktrace);
       return false;
     }
   }
+
+  // static Future<bool> register(
+  //     String email, String username, String password, String fullName) async {
+  //   final url = Uri.parse('$baseUrl/register');
+  //   try {
+  //     final response = await http.post(
+  //       url,
+  //       headers: {'Content-Type': 'application/json'},
+  //       body: jsonEncode({
+  //         'email': email,
+  //         'username': username,
+  //         'password': password,
+  //         'full_name': fullName,
+  //       }),
+  //     );
+  //     final data = jsonDecode(response.body);
+  //     return response.statusCode == 201 && data['success'] == true;
+  //   } catch (e) {
+  //     print('Registration error: $e');
+  //     return false;
+  //   }
+  // }
 
   static Future<bool> login(String email, String password) async {
     final url = Uri.parse('$baseUrl/login');
@@ -66,7 +73,6 @@ class AuthService {
         final data = jsonDecode(response.body);
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', data['token']);
-        await prefs.setString('username', data['username']);
         return true;
       } else {
         print('Login error: ${response.body}');
@@ -80,7 +86,7 @@ class AuthService {
 
   static Future<bool> googleLogin() async {
     if (!kIsWeb && !(Platform.isAndroid || Platform.isIOS)) {
-      print('❌ Google Sign-In is not supported on this platform.');
+      print('❌ Google Sign-In not supported on this platform.');
       return false;
     }
 
@@ -102,7 +108,6 @@ class AuthService {
         final data = jsonDecode(response.body);
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', data['token']);
-        await prefs.setString('username', data['username']);
         return true;
       } else {
         print('Google login error: ${response.body}');
@@ -116,7 +121,29 @@ class AuthService {
 
   static Future<String?> getUsername() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('username');
+    final token = prefs.getString('token');
+
+    if (token == null) return null;
+
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/profile'),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['username'];
+      } else {
+        print('Fetch username failed: ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching username: $e');
+      return null;
+    }
   }
 
   static Future<void> logout() async {

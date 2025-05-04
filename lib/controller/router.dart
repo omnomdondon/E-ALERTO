@@ -1,4 +1,7 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:geolocator_android/geolocator_android.dart';
 import 'package:go_router/go_router.dart';
 import 'package:e_alerto/controller/routes.dart';
 import 'package:e_alerto/view/layout_scaffold.dart';
@@ -15,6 +18,9 @@ import 'package:e_alerto/view/screens/camera_screen.dart';
 import 'package:e_alerto/view/screens/login_screen.dart';
 import 'package:e_alerto/view/screens/registration_screen.dart';
 import 'package:e_alerto/view/screens/rating_screen.dart';
+
+import '../view/screens/continue_to_otp_screen.dart';
+import '../view/screens/otp_verification_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 final _shellNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'shell');
@@ -40,6 +46,38 @@ GoRouter createRouter() {
         parentNavigatorKey: _rootNavigatorKey,
         pageBuilder: (context, state) =>
             const MaterialPage(child: RegistrationScreen()),
+      ),
+
+      GoRoute(
+        path: '/continue-otp',
+        name: 'continueOtp',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) {
+          final extra = state.extra as Map<String, String>;
+          return MaterialPage(
+            child: ContinueToOTPScreen(
+              email: extra['email']!,
+              phone: extra['phone']!,
+              username: extra['username']!,
+            ),
+          );
+        },
+      ),
+
+      GoRoute(
+        path: '/otp',
+        name: 'otp',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) {
+          final extra = state.extra as Map<String, String>;
+          return MaterialPage(
+            child: OTPVerificationScreen(
+              email: extra['email']!,
+              phone: extra['phone']!,
+              username: extra['username']!,
+            ),
+          );
+        },
       ),
 
       // Main App Shell (Navigation starts after login)
@@ -110,14 +148,23 @@ GoRouter createRouter() {
                 path: Routes.reportPage,
                 name: 'report',
                 pageBuilder: (context, state) {
-                  final imagePath = state.extra as String?;
+                  final extra = state.extra as Map<String, dynamic>? ?? {};
                   return MaterialPage(
-                    child: ReportScreen(imagePath: imagePath),
+                    child: ReportScreen(
+                      imagePath: extra['imagePath'] as String?,
+                      detections: (extra['detections'] as List<dynamic>?)
+                          ?.map((e) => Map<String, dynamic>.from(e))
+                          .toList(),
+                      outputImage: extra['outputImage'] as Uint8List?,
+                      location: extra['location'] as Position?,
+                      address: extra['address'] as String?,
+                    ),
                   );
                 },
+                // ✅ Add this nested route for /report/camera
                 routes: [
                   GoRoute(
-                    path: Routes.cameraPage,
+                    path: Routes.cameraPage, // this is 'camera'
                     name: 'camera',
                     pageBuilder: (context, state) =>
                         const MaterialPage(child: CameraScreen()),

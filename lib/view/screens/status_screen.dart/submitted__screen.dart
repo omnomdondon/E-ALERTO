@@ -9,10 +9,6 @@ class SubmittedScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final submittedReports = reports
-        .where((report) => (report.status.toLowerCase()) == 'submitted')
-        .toList();
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Submitted'),
@@ -20,7 +16,7 @@ class SubmittedScreen extends StatelessWidget {
         surfaceTintColor: Colors.white,
       ),
       backgroundColor: Colors.white,
-      body: submittedReports.isEmpty
+      body: reports.isEmpty
           ? Center(
               child: Text(
                 'No submitted reports',
@@ -32,8 +28,8 @@ class SubmittedScreen extends StatelessWidget {
             )
           : ListView.builder(
               padding: EdgeInsets.all(ScreenUtil().setSp(15)),
-              itemCount: submittedReports.length,
-              itemBuilder: (context, index) => submittedReports[index],
+              itemCount: reports.length,
+              itemBuilder: (context, index) => reports[index],
             ),
     );
   }

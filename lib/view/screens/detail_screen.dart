@@ -1,7 +1,8 @@
-import 'package:e_alerto/constants.dart';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:e_alerto/constants.dart';
 
 class DetailScreen extends StatefulWidget {
   final String reportNumber;
@@ -11,258 +12,196 @@ class DetailScreen extends StatefulWidget {
   final String date;
   final String username;
   final String description;
-  final bool rate;
   final String image;
-  final int initialUpVotes;
-  final int initialDownVotes;
 
-DetailScreen({
-  super.key,
-  this.reportNumber = '1',
-  this.classification = 'classification',
-  this.location = 'location',
-  this.status = 'status',
-  this.date = 'date',
-  this.username = 'username',
-  this.description = 'description',
-  this.rate = false,
-  this.initialUpVotes = 0,
-  this.initialDownVotes = 0,
-  Map<String, dynamic>? extra, 
-}) : image = extra?['image'] ?? '' {
-  debugPrint("Constructor image path: $image");
-}
-// Prevent null access
+  DetailScreen({
+    super.key,
+    required this.reportNumber,
+    required this.classification,
+    required this.location,
+    required this.status,
+    required this.date,
+    required this.username,
+    required this.description,
+    required Map<String, dynamic>? extra,
+  }) : image = extra?['image'] ?? '';
 
   @override
   State<DetailScreen> createState() => _DetailScreenState();
 }
 
 class _DetailScreenState extends State<DetailScreen> {
- int upVotes = 0;
+  int upVotes = 0;
   int downVotes = 0;
-  int totalVote = 0;
-  int userVote = 0; // 1 for upvote, -1 for downvote, 0 for neutral
-  String correctedImagePath = '';
-
-  @override
-  void initState() {
-    super.initState();
-    upVotes = widget.initialUpVotes;
-    downVotes = widget.initialDownVotes;
-    totalVote = upVotes - downVotes;
-
-    // Remove the leading slash
-    correctedImagePath = widget.image.startsWith('/')
-        ? widget.image.substring(1)
-        : widget.image;
-
-    debugPrint("Final image path used: $correctedImagePath");
-  }
+  int userVote = 0;
 
   void vote(int voteType) {
     setState(() {
       if (userVote == voteType) {
-        // If the user clicks the same vote, reset it
-        if (voteType == 1) {
-          upVotes--;
-        } else {
-          downVotes--;
-        }
+        if (voteType == 1) upVotes--;
+        if (voteType == -1) downVotes--;
         userVote = 0;
       } else {
-        // Remove previous vote if exists
-        if (userVote == 1) {
-          upVotes--;
-        } else if (userVote == -1) {
-          downVotes--;
-        }
-
-        // Apply new vote
-        if (voteType == 1) {
-          upVotes++;
-        } else {
-          downVotes++;
-        }
-
+        if (userVote == 1) upVotes--;
+        if (userVote == -1) downVotes--;
+        if (voteType == 1) upVotes++;
+        if (voteType == -1) downVotes++;
         userVote = voteType;
       }
-      totalVote = upVotes - downVotes;
     });
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      //title: const Text('Rating'),
-      backgroundColor: Colors.white,
-      surfaceTintColor: Colors.white,
-      leading: Padding(
-        padding: const EdgeInsets.all(8.0), // Adjust padding as needed
-        child: Container(
-          width: 5,
-          decoration: const BoxDecoration(
-            color: COLOR_PRIMARY, // Background color
-            shape: BoxShape.circle, // Makes it circular
-          ),
-          child: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white), // Icon color
-            onPressed: () {
-              GoRouter.of(context).pop();
-            },
+  Widget build(BuildContext context) {
+    final decodedImage = base64Decode(widget.image);
+    final int totalVote = upVotes - downVotes;
+
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            decoration: const BoxDecoration(
+              color: COLOR_PRIMARY,
+              shape: BoxShape.circle,
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () => GoRouter.of(context).pop(),
+            ),
           ),
         ),
       ),
-    ),
-    backgroundColor: Colors.white,
-    body: ListView(
-      padding: EdgeInsets.all(ScreenUtil().setSp(15)),
-      children: [
-        Padding(padding: EdgeInsets.fromLTRB(ScreenUtil().setSp(15), 8, ScreenUtil().setSp(15), 0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center, // ✅ Center items
+      backgroundColor: Colors.white,
+      body: ListView(
+        padding: EdgeInsets.all(15.w),
+        children: [
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                    widget.classification,
-                    style: const TextStyle(
-                      fontSize: 18,//ScreenUtil().setSp(16),
-                      color: Colors.black,
-                      //fontWeight: FontWeight.bold
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {},
-                    style:  ElevatedButton.styleFrom(
-                      backgroundColor: getStatusColor(widget.status),// Set background color
-                      minimumSize: Size(ScreenUtil().setWidth(100), ScreenUtil().setHeight(25)), // Ensures a minimum width and height
-                      maximumSize: Size(ScreenUtil().setWidth(120), ScreenUtil().setHeight(100)),
-                      //textStyle: TextStyle(fontSize: 12) 
-                    ),
-                    child: Text(widget.status, 
-                      style: const TextStyle(
-                      fontSize: 14, //ScreenUtil().setSp(10),
-                      color: Colors.white
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
+              // Classification and status
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
-                    widget.location,
-                    style: const TextStyle(
-                      fontSize: 16, //ScreenUtil().setSp(12),
-                      color: Colors.black
-                    ),
-                  ),
-                  Padding(padding: const EdgeInsets.fromLTRB(0, 0, 5, 0),
-                    child: Text(
-                      widget.date,
-                      style: const TextStyle(
-                        fontSize: 14, //ScreenUtil().setSp(12),
-                        color: Colors.black
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.username,
-                    style: TextStyle(
-                      fontSize: 14, //ScreenUtil().setSp(10),
-                      color: Colors.grey.shade600
-                    ),
-                  ),
-                ],
-              ),
-
-              SizedBox(height: ScreenUtil().setHeight(5)),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Flexible(child: Text(
-                      widget.description,
-                      overflow: TextOverflow.clip,
-                      style: TextStyle(
-                        fontSize: 14, //ScreenUtil().setSp(10),
-                        color: Colors.grey.shade600
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              SizedBox(height: ScreenUtil().setHeight(20)),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: ClipRRect(
+                  Text(widget.classification,
+                      style: TextStyle(fontSize: 18.sp, color: Colors.black)),
+                  Container(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                    decoration: BoxDecoration(
+                      color: getStatusColor(widget.status),
                       borderRadius: BorderRadius.circular(20),
-                      child: Image.asset(
-                        correctedImagePath,
-                        width: double.infinity, // ✅ Take available space
-                        height: ScreenUtil().setHeight(200), // ✅ Avoid full screen height
-                        fit: BoxFit.cover, // ✅ Adjust to fill container
+                    ),
+                    child: Text(
+                      widget.status,
+                      style: TextStyle(
+                        fontSize: 13.sp,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
                 ],
               ),
+              SizedBox(height: 8.h),
 
+              // Location
+              Text(widget.location,
+                  style: const TextStyle(fontSize: 14, color: Colors.black)),
+              SizedBox(height: 10.h),
 
-              //SizedBox(height: ScreenUtil().setHeight(5)),
+              // Description
+              Text(widget.description,
+                  style: TextStyle(fontSize: 14, color: Colors.grey.shade800)),
+              SizedBox(height: 20.h),
+
+              // Image
+              ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Image.memory(
+                  decodedImage,
+                  width: double.infinity,
+                  height: 200.h,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              SizedBox(height: 20.h),
+
+              // 🔻 Username + Date + Vote Row
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  TextButton.icon(
-                    onPressed: () {
-                      vote(1);
-                    }, 
-                    icon: Icon(Icons.arrow_circle_up, size: 22, /*ScreenUtil().setSp(20),*/ color: userVote == 1 ? COLOR_PRIMARY : Colors.grey.shade400, weight: 20,), 
-                    label: Text(totalVote.toString(),
-                      style: TextStyle(
-                        color: userVote == 1 || userVote == -1 ? COLOR_PRIMARY : Colors.grey.shade400,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16, //ScreenUtil().setSp(12)
+                  // Username and date
+                  Expanded(
+                    child: Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'Posted by ',
+                            style: TextStyle(
+                                fontSize: 11.sp, color: Colors.grey.shade600),
+                          ),
+                          TextSpan(
+                            text: '@${widget.username}',
+                            style: TextStyle(
+                                fontSize: 11.sp,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.blue.shade800),
+                          ),
+                          TextSpan(
+                            text: ' • ${widget.date}',
+                            style: TextStyle(
+                                fontSize: 11.sp, color: Colors.grey.shade600),
+                          ),
+                        ],
                       ),
-                    ),          
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      vote(-1);
-                    }, 
-                    icon: const Icon(Icons.arrow_circle_down, weight: 22,), 
-                    
-                    style: IconButton.styleFrom(
-                      foregroundColor: userVote == -1 ? COLOR_PRIMARY : Colors.grey.shade400,
-                      iconSize: 22, //ScreenUtil().setSp(20)
                     ),
-                  )
+                  ),
+
+                  // Voting buttons
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: () => vote(1),
+                        icon: Icon(
+                          Icons.arrow_upward,
+                          color: userVote == 1
+                              ? Colors.blue
+                              : Colors.grey.shade400,
+                        ),
+                      ),
+                      Text(
+                        '$totalVote',
+                        style: TextStyle(
+                          color: Colors.black87,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14.sp,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => vote(-1),
+                        icon: Icon(
+                          Icons.arrow_downward,
+                          color: userVote == -1
+                              ? Colors.red
+                              : Colors.grey.shade400,
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
-              )
+              ),
             ],
           ),
-        ),
-      ]
-    ),
-  );
+        ],
+      ),
+    );
+  }
 }
 
-
-Color getStatusColor (String status) {
+Color getStatusColor(String status) {
   switch (status.toLowerCase()) {
     case 'submitted':
       return COLOR_SUBMITTED;
@@ -273,6 +212,6 @@ Color getStatusColor (String status) {
     case 'resolved':
       return COLOR_RESOLVED;
     default:
-      return COLOR_DEFAULT; // Default color if no match
+      return COLOR_DEFAULT;
   }
 }

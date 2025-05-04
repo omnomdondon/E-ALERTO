@@ -9,11 +9,6 @@ class InProgressScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final inProgressReports = reports
-        .where(
-            (report) => (report.status.toLowerCase()) == 'in progress')
-        .toList();
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('In Progress'),
@@ -21,7 +16,7 @@ class InProgressScreen extends StatelessWidget {
         surfaceTintColor: Colors.white,
       ),
       backgroundColor: Colors.white,
-      body: inProgressReports.isEmpty
+      body: reports.isEmpty
           ? Center(
               child: Text(
                 'No in progress reports',
@@ -33,8 +28,8 @@ class InProgressScreen extends StatelessWidget {
             )
           : ListView.builder(
               padding: EdgeInsets.all(ScreenUtil().setSp(15)),
-              itemCount: inProgressReports.length,
-              itemBuilder: (context, index) => inProgressReports[index],
+              itemCount: reports.length,
+              itemBuilder: (context, index) => reports[index],
             ),
     );
   }

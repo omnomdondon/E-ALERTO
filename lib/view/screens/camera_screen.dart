@@ -1,6 +1,14 @@
-import 'package:camera/camera.dart';
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:permission_handler/permission_handler.dart';
+
 
 class CameraScreen extends StatefulWidget {
   const CameraScreen({super.key});
@@ -10,166 +18,127 @@ class CameraScreen extends StatefulWidget {
 }
 
 class _CameraScreenState extends State<CameraScreen> {
-  late CameraController _controller;
-  late Future<void> _initializeControllerFuture;
-  bool _isLoading = true;
-  bool _isCameraReady = false;
-  bool _isFlashOn = false;
-  int _selectedCameraIndex = 0;
-  List<CameraDescription>? _cameras;
-  bool _isTakingPicture = false;
+  File? _capturedImage;
+  List<Map<String, dynamic>> detections = [];
+  bool isLoading = false;
+  Uint8List? outputImage;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _initializeCamera());
+    _openCameraAndCapture();
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  Future<void> _openCameraAndCapture() async {
+    final picker = ImagePicker();
+    final XFile? pickedImage =
+        await picker.pickImage(source: ImageSource.camera);
 
-  Future<void> _initializeCamera() async {
-    try {
-      _cameras = await availableCameras();
-      if (_cameras == null || _cameras!.isEmpty) {
-        setState(() => _isLoading = false);
-        return;
-      }
-      _controller = CameraController(
-        _cameras![_selectedCameraIndex],
-        ResolutionPreset.high,
-        enableAudio: false,
-      );
-      _initializeControllerFuture = _controller.initialize();
-      await _initializeControllerFuture;
-      if (!mounted) return;
+    if (pickedImage != null) {
       setState(() {
-        _isLoading = false;
-        _isCameraReady = true;
+        _capturedImage = File(pickedImage.path);
+        detections = [];
+        isLoading = true;
+        outputImage = null;
       });
-    } catch (e) {
-      setState(() => _isLoading = false);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to initialize camera')),
-        );
-      }
+
+      await _sendToBackend(_capturedImage!);
+    } else {
+      Navigator.pop(context);
     }
   }
 
-  Future<void> _captureImage() async {
-    if (_isTakingPicture || !_isCameraReady) return;
-    setState(() => _isTakingPicture = true);
+  Future<void> _sendToBackend(File image) async {
+    final uri = Uri.parse('http://192.168.100.121:5000/detect');
+    var request = http.MultipartRequest('POST', uri);
+    request.files.add(await http.MultipartFile.fromPath('image', image.path));
+    request.headers['Authorization'] = 'Bearer nagkaon_kana_lab';
+
     try {
-      await _initializeControllerFuture;
-      final image = await _controller.takePicture();
-      if (!mounted) return;
-      Navigator.of(context).pop(image.path);
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to take picture')),
-        );
+      // 🧭 Get Location
+      Position? position = await _getCurrentLocation();
+      String? address;
+
+      if (position != null) {
+        address = await _getAddressFromCoordinates(position.latitude, position.longitude);
       }
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+
+        setState(() {
+          detections = List<Map<String, dynamic>>.from(json['detections']);
+          if (json['image'] != null && json['image'] is String) {
+            outputImage = base64Decode(json['image']);
+          }
+        });
+
+        if (mounted) {
+          context.go('/report', extra: {
+            'imagePath': _capturedImage!.path,
+            'detections': detections,
+            'outputImage': outputImage,
+            'location': position,
+            'address': address,
+          });
+        }
+
+      } else {
+        print('Failed: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error sending image: $e');
     } finally {
-      if (mounted) setState(() => _isTakingPicture = false);
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
-  Future<void> _switchCamera() async {
-    if (_cameras == null || _cameras!.length < 2 || _isTakingPicture) return;
-    setState(() {
-      _isCameraReady = false;
-      _selectedCameraIndex = _selectedCameraIndex == 0 ? 1 : 0;
-    });
-    await _controller.dispose();
-    await _initializeCamera();
+  Future<Position?> _getCurrentLocation() async {
+    // 🔐 Request location permission using permission_handler
+    final status = await Permission.location.request();
+
+    if (status.isDenied || status.isPermanentlyDenied) {
+      print("Location permission denied.");
+      return null;
+    }
+
+    // 📍 Make sure location services are enabled
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      print("Location services are OFF");
+      await Geolocator.openLocationSettings();
+      return null;
+    }
+
+    return await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
   }
+
+  Future<String?> _getAddressFromCoordinates(double lat, double lon) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(lat, lon);
+      if (placemarks.isNotEmpty) {
+        final place = placemarks.first;
+        return "${place.street}, ${place.subLocality}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
+      }
+    } catch (e) {
+      print("Error in reverse geocoding: $e");
+    }
+  return null;
+}
+
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       backgroundColor: Colors.black,
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Stack(
-              children: [
-                if (_isCameraReady)
-                  SizedBox.expand(child: CameraPreview(_controller)),
-                Positioned(
-                  bottom: ScreenUtil().setHeight(40),
-                  left: 0,
-                  right: 0,
-                  child: Center(
-                    child: _isTakingPicture
-                        ? const CircularProgressIndicator()
-                        : GestureDetector(
-                            onTap: _captureImage,
-                            child: Container(
-                              width: ScreenUtil().setWidth(70),
-                              height: ScreenUtil().setWidth(70),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 4),
-                              ),
-                              child: Container(
-                                margin: const EdgeInsets.all(4),
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                  ),
-                ),
-                Positioned(
-                  top: ScreenUtil().setHeight(40),
-                  left: ScreenUtil().setWidth(15),
-                  child: IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white, size: 30),
-                    onPressed:
-                        _isTakingPicture ? null : () => Navigator.of(context).pop(),
-                  ),
-                ),
-                Positioned(
-                  top: ScreenUtil().setHeight(40),
-                  right: ScreenUtil().setWidth(15),
-                  child: Column(
-                    children: [
-                      IconButton(
-                        icon: Icon(
-                          _isFlashOn ? Icons.flash_on : Icons.flash_off,
-                          color: Colors.white,
-                          size: 30,
-                        ),
-                        onPressed: _isTakingPicture
-                            ? null
-                            : () {
-                                if (_isCameraReady) {
-                                  setState(() => _isFlashOn = !_isFlashOn);
-                                  _controller.setFlashMode(
-                                    _isFlashOn ? FlashMode.torch : FlashMode.off,
-                                  );
-                                }
-                              },
-                      ),
-                      if (_cameras != null && _cameras!.length > 1) ...[
-                        SizedBox(height: ScreenUtil().setHeight(20)),
-                        IconButton(
-                          icon: const Icon(Icons.cameraswitch,
-                              color: Colors.white, size: 30),
-                          onPressed: _isTakingPicture ? null : _switchCamera,
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ],
-            ),
+      body: Center(child: CircularProgressIndicator()),
     );
   }
 }

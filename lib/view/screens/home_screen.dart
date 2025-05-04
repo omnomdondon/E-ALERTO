@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:e_alerto/constants.dart';
 import 'package:e_alerto/view/screens/status_screen.dart/accepted_screen.dart';
 import 'package:e_alerto/view/screens/status_screen.dart/in_progress_screen.dart';
 import 'package:e_alerto/view/screens/status_screen.dart/resolved_screen.dart';
@@ -6,55 +8,88 @@ import 'package:e_alerto/view/widgets/custom_section_box.dart';
 import 'package:e_alerto/view/widgets/post_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
-  final List<PostCard> reports = const [
-    PostCard(
-      reportNumber: '1',
-      classification: 'Cracked Bridge',
-      location: 'Binondo-Intramuros Bridge',
-      status: 'Accepted',
-      date: '1/25/2025',
-      username: '@omnom_alias',
-      description:
-          'Inspections have revealed significant cracks in the support beams',
-      image: '/assets/images/image1.png',
-    ),
-    PostCard(
-      reportNumber: '2',
-      classification: 'Deteriorated Parking',
-      location: '106 Mendiola St.',
-      status: 'In Progress',
-      date: '3/1/2025',
-      username: '@juan_dcruz',
-      description:
-          'The surface of the public parking lot is severely deteriorated',
-      image: '/assets/images/image2.png',
-    ),
-    PostCard(
-      reportNumber: '3',
-      classification: 'Sidewalk Damage',
-      location: 'Gerardo Tuazon, Balic Balic',
-      status: 'Submitted',
-      date: '2/27/2025',
-      username: '@saur_latina',
-      description:
-          'The sidewalk is cracked and uneven, posing a tripping hazard',
-      image: '/assets/images/image3.png',
-    ),
-    PostCard(
-      reportNumber: '4',
-      classification: 'Broken Traffic Light',
-      location: 'Taft Avenue',
-      status: 'Resolved',
-      date: '3/6/2025',
-      username: '@momioni',
-      description: 'Broken traffic light causes traffic at the intersection',
-      image: '/assets/images/image4.png',
-    ),
-  ];
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  List<PostCard> submitted = [];
+  List<PostCard> accepted = [];
+  List<PostCard> inProgress = [];
+  List<PostCard> resolved = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchReports();
+  }
+
+  String formatDate(String rawDate) {
+    try {
+      final date = DateTime.parse(rawDate);
+      return DateFormat('MM/dd/yyyy').format(date);
+    } catch (_) {
+      return rawDate;
+    }
+  }
+
+  Future<void> fetchReports() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      final uri = Uri.parse("http://192.168.100.121:3000/api/reports");
+      final response = await http.get(
+        uri,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final reports = List<Map<String, dynamic>>.from(data['reports']);
+
+        List<PostCard> buildCards(String status) {
+          return reports
+              .where((r) =>
+                  (r['status']?.toString().toLowerCase() ?? '') ==
+                  status.toLowerCase())
+              .map((r) => PostCard(
+                    reportNumber: r['reportID'] ?? '',
+                    classification: r['classification'] ?? '',
+                    location: r['location'] ?? '',
+                    status: r['status'] ?? '',
+                    date: formatDate(r['timestamp'] ?? ''),
+                    username: r['username'] ?? '',
+                    description: r['description'] ?? '',
+                    image: r['image_file'] ?? '',
+                  ))
+              .toList();
+        }
+
+        setState(() {
+          submitted = buildCards('Submitted');
+          accepted = buildCards('Accepted');
+          inProgress = buildCards('In Progress');
+          resolved = buildCards('Resolved');
+          isLoading = false;
+        });
+      } else {
+        print("Failed to load reports: ${response.body}");
+        setState(() => isLoading = false);
+      }
+    } catch (e) {
+      print("Error fetching reports: $e");
+      setState(() => isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,145 +100,40 @@ class HomeScreen extends StatelessWidget {
         surfaceTintColor: Colors.white,
       ),
       backgroundColor: Colors.white,
-      body: Padding(
-        padding: EdgeInsets.all(ScreenUtil().setSp(16)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            StatusBox(
-              title: 'Submitted',
-              color: Colors.blueAccent,
-              screen: SubmittedScreen(reports: reports),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : RefreshIndicator(
+              onRefresh: fetchReports,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.all(ScreenUtil().setSp(16)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    StatusBox(
+                      title: 'Submitted',
+                      color: COLOR_SUBMITTED,
+                      screen: SubmittedScreen(reports: submitted),
+                    ),
+                    StatusBox(
+                      title: 'Accepted',
+                      color: COLOR_ACCEPTED,
+                      screen: AcceptedScreen(reports: accepted),
+                    ),
+                    StatusBox(
+                      title: 'In Progress',
+                      color: COLOR_INPROGRESS,
+                      screen: InProgressScreen(reports: inProgress),
+                    ),
+                    StatusBox(
+                      title: 'Resolved',
+                      color: COLOR_RESOLVED,
+                      screen: ResolvedScreen(reports: resolved),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            StatusBox(
-              title: 'Accepted',
-              color: Colors.green,
-              screen: AcceptedScreen(reports: reports),
-            ),
-            StatusBox(
-              title: 'In Progress',
-              color: Colors.orange,
-              screen: InProgressScreen(reports: reports),
-            ),
-            StatusBox(
-              title: 'Resolved',
-              color: Colors.purple,
-              screen: ResolvedScreen(reports: reports),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
-
-
-
-// // home_screen.dart OPTION 1
-// import 'package:e_alerto/view/widgets/custom_section_box.dart';
-// import 'package:e_alerto/view/widgets/post_card.dart';
-// import 'package:flutter/material.dart';
-
-// class HomeScreen extends StatefulWidget {
-//   const HomeScreen({super.key});
-
-//   @override
-//   State<HomeScreen> createState() => _HomeScreenState();
-// }
-
-// class _HomeScreenState extends State<HomeScreen> {
-//   String selectedStatus = 'Submitted';
-//   final List<PostCard> reports = [
-//     const PostCard(
-//       reportNumber: '1',
-//       classification: 'Cracked Bridge',
-//       location: 'Binondo-Intramuros Bridge',
-//       status: 'Accepted',
-//       date: '1/25/2025',
-//       username: '@omnom_alias',
-//       description:
-//           'Inspections have revealed significant cracks in the support beams',
-//       image: '/assets/images/image1.png',
-//     ),
-//     const PostCard(
-//       reportNumber: '2',
-//       classification: 'Deteriorated Parking',
-//       location: '106 Mendiola St.',
-//       status: 'In Progress',
-//       date: '3/1/2025',
-//       username: '@juan_dcruz',
-//       description:
-//           'The surface of the public parking lot is severely deteriorated',
-//       image: '/assets/images/image2.png',
-//     ),
-//     const PostCard(
-//       reportNumber: '3',
-//       classification: 'Sidewalk Damage',
-//       location: 'Gerardo Tuazon, Balic Balic',
-//       status: 'Submitted',
-//       date: '2/27/2025',
-//       username: '@saur_latina',
-//       description:
-//           'The sidewalk is cracked and uneven, posing a tripping hazard',
-//       image: '/assets/images/image3.png',
-//     ),
-//     const PostCard(
-//       reportNumber: '4',
-//       classification: 'Broken Traffic Light',
-//       location: 'Taft Avenue',
-//       status: 'Resolved',
-//       date: '3/6/2025',
-//       username: '@momioni',
-//       description: 'Broken traffic light causes traffic at the intersection',
-//       image: '/assets/images/image4.png',
-//     ),
-//   ];
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Row(
-//           mainAxisSize: MainAxisSize.min,
-//           children: [
-//             const Text('Home'),
-//             const SizedBox(width: 8),
-//             PopupMenuButton<String>(
-//               icon: const Icon(Icons.arrow_drop_down),
-//               onSelected: (String newValue) {
-//                 setState(() {
-//                   selectedStatus = newValue;
-//                 });
-//               },
-//               itemBuilder: (BuildContext context) => [
-//                 const PopupMenuItem<String>(
-//                   value: 'Submitted',
-//                   child: Text('Submitted'),
-//                 ),
-//                 const PopupMenuItem<String>(
-//                   value: 'Accepted',
-//                   child: Text('Accepted'),
-//                 ),
-//                 const PopupMenuItem<String>(
-//                   value: 'In Progress',
-//                   child: Text('In Progress'),
-//                 ),
-//                 const PopupMenuItem<String>(
-//                   value: 'Resolved',
-//                   child: Text('Resolved'),
-//                 ),
-//               ],
-//             ),
-//           ],
-//         ),
-//         backgroundColor: Colors.white,
-//         surfaceTintColor: Colors.white,
-//       ),
-//       backgroundColor: Colors.white,
-//       body: CustomSectionBox(
-//         reports: reports,
-//         selectedStatus: selectedStatus,
-//       ),
-//     );
-//   }
-// }

@@ -1,5 +1,8 @@
 username: e_alerto
 password: HcZkgeCGBrPUpIop
 
-MONGO_URI: mongodb+srv://e_alerto:HcZkgeCGBrPUpIop@e-alerto.7rzhvko.mongodb.net/
+MONGO_URI (Brandon): mongodb+srv://e_alerto:HcZkgeCGBrPUpIop@e-alerto.7rzhvko.mongodb.net/
+MONGO_URI (E-ALERTO): mongodb+srv://ealertoph:e-alert0%21234@e-alerto0.cndansd.mongodb.net
 SECRET_KEY: 1b5ed9a31dd53950bebd5055811faa5df65c3c2caf1a4f2091e17d716b407247101e067571104e9d6d35bb6cd85b60d7e8c6f478d34f9742ffb1e888eea91cb9
+
+Brevo API KEY: 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
