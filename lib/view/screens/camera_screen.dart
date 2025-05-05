@@ -9,7 +9,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-
 class CameraScreen extends StatefulWidget {
   const CameraScreen({super.key});
 
@@ -60,7 +59,8 @@ class _CameraScreenState extends State<CameraScreen> {
       String? address;
 
       if (position != null) {
-        address = await _getAddressFromCoordinates(position.latitude, position.longitude);
+        address = await _getAddressFromCoordinates(
+            position.latitude, position.longitude);
       }
 
       final streamedResponse = await request.send();
@@ -85,7 +85,6 @@ class _CameraScreenState extends State<CameraScreen> {
             'address': address,
           });
         }
-
       } else {
         print('Failed: ${response.statusCode}');
       }
@@ -130,9 +129,8 @@ class _CameraScreenState extends State<CameraScreen> {
     } catch (e) {
       print("Error in reverse geocoding: $e");
     }
-  return null;
-}
-
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {

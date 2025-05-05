@@ -79,6 +79,25 @@ class StatusBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Icons for the different statuses
+    IconData statusIcon;
+    switch (title.toLowerCase()) {
+      case 'submitted':
+        statusIcon = Icons.assignment_late;
+        break;
+      case 'resolved':
+        statusIcon = Icons.check_circle_outline;
+        break;
+      case 'in progress':
+        statusIcon = Icons.hourglass_empty;
+        break;
+      case 'accepted':
+        statusIcon = Icons.check_circle;
+        break;
+      default:
+        statusIcon = Icons.report_problem;
+    }
+
     return GestureDetector(
       onTap: () =>
           Navigator.push(context, MaterialPageRoute(builder: (_) => screen)),
@@ -90,16 +109,34 @@ class StatusBox extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(ScreenUtil().radius(12)),
-          border: Border.all(color: color.withOpacity(0.5)),
+          borderRadius: BorderRadius.circular(ScreenUtil().radius(16)),
+          border: Border.all(color: color.withOpacity(0.3)),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.1),
+              blurRadius: 8,
+              spreadRadius: 4,
+            ),
+          ],
         ),
-        child: Text(
-          title,
-          style: TextStyle(
-            fontSize: ScreenUtil().setSp(18),
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Icon(
+              statusIcon,
+              color: color,
+              size: ScreenUtil().setSp(22),
+            ),
+            SizedBox(width: ScreenUtil().setWidth(12)),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: ScreenUtil().setSp(18),
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+            ),
+          ],
         ),
       ),
     );

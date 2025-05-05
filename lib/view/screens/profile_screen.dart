@@ -58,16 +58,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (reportsRes.statusCode == 200) {
       final data = jsonDecode(reportsRes.body);
-      setState(() => allReports = data['reports']);
+      setState(() {
+        allReports = data['reports'];
+      });
     }
-  }
-
-  void _verifyAccount() {
-    context.pushNamed('otp', extra: {
-      'email': email,
-      'phone': phone,
-      'username': username,
-    }).then((_) => _fetchUserProfileAndReports());
   }
 
   @override
@@ -128,17 +122,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             const Text('Edit Profile',
                                 style: TextStyle(
                                     fontSize: 12, color: Colors.black87)),
-                            if (!verified)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 8),
-                                child: OutlinedButton.icon(
-                                  onPressed: _verifyAccount,
-                                  icon: const Icon(Icons.verified,
-                                      size: 18, color: Colors.blue),
-                                  label: const Text("Verify Account",
-                                      style: TextStyle(color: Colors.black)),
-                                ),
-                              ),
                           ],
                         ),
                       ),
@@ -179,11 +162,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 ToRateTab(
                   username: username,
-                  reports: allReports
-                      .where((r) =>
-                          r['username'] == username &&
-                          r['status'].toLowerCase() == 'resolved')
-                      .toList(),
+                  reports: allReports.where((r) {
+                    return r['username'] == username &&
+                        r['status'] == 'Resolved';
+                  }).toList(),
                 ),
                 HistoryTab(username: username),
               ],
