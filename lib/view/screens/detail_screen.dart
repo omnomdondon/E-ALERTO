@@ -2,18 +2,18 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart'; // For formatting date
+import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../../constants.dart';
-import '../widgets/notification_card.dart'; // Import the timeago package
+import '../widgets/notification_card.dart';
 
 class DetailScreen extends StatefulWidget {
   final String reportNumber;
   final String classification;
   final String location;
   final String status;
-  final String date; // Raw date passed here
+  final String date;
   final String username;
   final String description;
   final String image;
@@ -24,7 +24,7 @@ class DetailScreen extends StatefulWidget {
     required this.classification,
     required this.location,
     required this.status,
-    required this.date, // Raw date passed here
+    required this.date,
     required this.username,
     required this.description,
     required Map<String, dynamic>? extra,
@@ -57,14 +57,17 @@ class _DetailScreenState extends State<DetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Decode the base64 image string passed in `extra`
     base64Decode(widget.image);
 
-    // Convert the raw date string to DateTime and format it (similar to how it's done in PostCard)
-    final parsedDate = DateFormat("yyyy-MM-dd").parse(widget.date);
-    final timestamp = parsedDate.toLocal(); // Convert to local time
-    final timeAgo = timeago
-        .format(timestamp); // Convert to relative time (e.g., 2 hours ago)
+    // Date Parsing
+    DateTime parsedDate;
+    try {
+      parsedDate = DateFormat("yyyy-MM-dd").parse(widget.date);
+    } catch (e) {
+      parsedDate = DateTime.now();
+    }
+    final timeAgo =
+        timeago.format(parsedDate); // Format the date to relative time
 
     final int totalVote = upVotes - downVotes;
 
@@ -90,10 +93,24 @@ class _DetailScreenState extends State<DetailScreen> {
       body: ListView(
         padding: EdgeInsets.all(15.w),
         children: [
+          Hero(
+            tag:
+                'report_${widget.reportNumber}', // Unique tag for Hero transition
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Image.memory(
+                base64Decode(widget.image),
+                width: double.infinity,
+                height: 180.h,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          SizedBox(height: 20.h),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Classification and status
+              // Classification and Status
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -129,23 +146,10 @@ class _DetailScreenState extends State<DetailScreen> {
                   style: TextStyle(fontSize: 14, color: Colors.grey.shade800)),
               SizedBox(height: 20.h),
 
-              // Image
-              ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Image.memory(
-                  base64Decode(widget.image), // Decoding base64 image data
-                  width: double.infinity,
-                  height: 150.h,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              SizedBox(height: 20.h),
-
-              // 🔻 Username + Date + Vote Row
+              // Username + Date + Voting
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Username and date
                   Expanded(
                     child: Text.rich(
                       TextSpan(
@@ -153,26 +157,24 @@ class _DetailScreenState extends State<DetailScreen> {
                           TextSpan(
                             text: 'Posted by ',
                             style: TextStyle(
-                                fontSize: 11.sp, color: Colors.grey.shade600),
+                                fontSize: 12.sp, color: Colors.grey.shade600),
                           ),
                           TextSpan(
                             text: '@${widget.username}',
                             style: TextStyle(
-                                fontSize: 11.sp,
+                                fontSize: 12.sp,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.blue.shade800),
                           ),
                           TextSpan(
-                            text: ' • $timeAgo', // Display relative time
+                            text: ' • $timeAgo', // Relative time
                             style: TextStyle(
-                                fontSize: 11.sp, color: Colors.grey.shade600),
+                                fontSize: 12.sp, color: Colors.grey.shade600),
                           ),
                         ],
                       ),
                     ),
                   ),
-
-                  // Voting buttons
                   Row(
                     children: [
                       IconButton(

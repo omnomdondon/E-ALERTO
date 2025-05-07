@@ -15,7 +15,7 @@ class RatingScreen extends StatefulWidget {
   final String date;
   final String username;
   final String description;
-  final String image;
+  final String? image;
   final int initialUpVotes;
   final int initialDownVotes;
   final bool rate;
@@ -30,9 +30,9 @@ class RatingScreen extends StatefulWidget {
     required this.username,
     required this.description,
     this.rate = false,
-    this.image = '',
+    this.image,
     this.initialUpVotes = 0,
-    this.initialDownVotes = 0,
+    this.initialDownVotes = 0, required Map<String, dynamic> extra,
   });
 
   @override
@@ -40,111 +40,124 @@ class RatingScreen extends StatefulWidget {
 }
 
 class _RatingScreenState extends State<RatingScreen> {
-  TextEditingController descriptionController = TextEditingController(); 
+  TextEditingController descriptionController = TextEditingController();
   double overallQuality = 0;
   double serviceQuality = 0;
   double speedQuality = 0;
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      title: const Text('Rating'),
-      backgroundColor: Colors.white,
-      surfaceTintColor: Colors.white,
-      leading: Padding(
-        padding: const EdgeInsets.all(8.0), // Adjust padding as needed
-        child: Container(
-          width: 5,
-          decoration: const BoxDecoration(
-            color: COLOR_PRIMARY, // Background color
-            shape: BoxShape.circle, // Makes it circular
-          ),
-          child: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white), // Icon color
-            onPressed: () {
-              GoRouter.of(context).pop();
-            },
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Rating'),
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            width: 5,
+            decoration: const BoxDecoration(
+              color: COLOR_PRIMARY,
+              shape: BoxShape.circle,
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () => GoRouter.of(context).pop(),
+            ),
           ),
         ),
       ),
-    ),
-    backgroundColor: Colors.white,
-    body: ListView(
-      padding: EdgeInsets.all(ScreenUtil().setSp(15)),
-      children: [
-        PostCard(
-          reportNumber: widget.reportNumber,
-          classification: widget.classification,
-          location: widget.location,
-          status: widget.status,
-          date: widget.date,
-          username: widget.username,
-          description: widget.description,
-          image: widget.image,
-        ),
-
-        Form(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(ScreenUtil().setSp(15)),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center, // ✅ Center items
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildRatingRow('Overall Quality', overallQuality, (rating) {
-                setState(() => overallQuality = rating);
-              }),
-              _buildRatingRow('Quality of Service', serviceQuality, (rating) {
-                setState(() => serviceQuality = rating);
-              }),
-              _buildRatingRow('Quality of Speed', speedQuality, (rating) {
-                setState(() => speedQuality = rating);
-              }),
-              SizedBox(height: ScreenUtil().setHeight(20)),
-
-              const Text(
-                "Description", 
-                style: TextStyle(color: Colors.black54)
+              PostCard(
+                reportNumber: widget.reportNumber,
+                classification: widget.classification,
+                location: widget.location,
+                status: widget.status,
+                date: widget.date,
+                username: widget.username,
+                description: widget.description,
+                image: widget.image ?? '',
               ),
-              SizedBox(height: ScreenUtil().setHeight(10)),
-              CustomTextArea(
-                controller: descriptionController,
-                hintText: "Write your feedback here...",
-                maxLines: 4,
+              SizedBox(height: 20.h),
+              Form(
+                child: Column(
+                  children: [
+                    _buildRatingRow('Overall Quality', overallQuality,
+                        (rating) {
+                      setState(() => overallQuality = rating);
+                    }),
+                    _buildRatingRow('Quality of Service', serviceQuality,
+                        (rating) {
+                      setState(() => serviceQuality = rating);
+                    }),
+                    _buildRatingRow('Quality of Speed', speedQuality, (rating) {
+                      setState(() => speedQuality = rating);
+                    }),
+                    SizedBox(height: 20.h),
+                    const Text(
+                      "Description",
+                      style: TextStyle(color: Colors.black54),
+                    ),
+                    SizedBox(height: 10.h),
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: 150.h,
+                      ),
+                      child: CustomTextArea(
+                        controller: descriptionController,
+                        hintText: "Write your feedback here...",
+                        maxLines: 4,
+                      ),
+                    ),
+                    SizedBox(height: 20.h),
+                    CustomFilledButton(
+                      text: 'Submit',
+                      onPressed: () => {},
+                      fullWidth: true,
+                    ),
+                  ],
+                ),
               ),
-              SizedBox(height: ScreenUtil().setHeight(20)),
-
-              CustomFilledButton(
-                text: 'Submit', 
-                onPressed: () => {}, //GoRouter.of(context).go('/home'),
-                fullWidth: true,
-              ),
-              const SizedBox(height: 30),        
             ],
-          )
-        )
+          ),
+        ),
+      ),
+    );
+  }
 
-      ]
-    )
-  );
-}
-
-Widget _buildRatingRow(String label, double rating, Function(double) onRatingUpdate) {
+  Widget _buildRatingRow(
+      String label, double rating, Function(double) onRatingUpdate) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: EdgeInsets.symmetric(vertical: 8.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
           RatingBar.builder(
             initialRating: rating,
             minRating: 1,
             direction: Axis.horizontal,
             allowHalfRating: false,
             itemCount: 5,
-            itemSize: 25,
-            itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
-            itemBuilder: (context, _) => const Icon(Icons.star, color: COLOR_INPROGRESS),
+            itemSize: 25.w,
+            itemPadding: EdgeInsets.symmetric(horizontal: 4.w),
+            itemBuilder: (context, _) =>
+                const Icon(Icons.star, color: COLOR_INPROGRESS),
             onRatingUpdate: onRatingUpdate,
           ),
         ],
       ),
     );
   }
+}

@@ -97,12 +97,14 @@ GoRouter createRouter() {
                 pageBuilder: (context, state) =>
                     const MaterialPage(child: HomeScreen()),
                 routes: [
+                  // For home detail
                   GoRoute(
-                    path: Routes.homeDetail,
+                    path: '/home/detail/:reportNumber',
                     name: 'homeDetail',
                     pageBuilder: (context, state) {
-                      final params = state.uri.queryParameters;
-                      final imageExtra = state.extra as Map<String, dynamic>?;
+                      final reportNumber =
+                          state.pathParameters['reportNumber'] ?? '';
+                      final extra = state.extra as Map<String, dynamic>? ?? {};
 
                       return CustomTransitionPage(
                         transitionDuration: const Duration(milliseconds: 600),
@@ -112,14 +114,14 @@ GoRouter createRouter() {
                               opacity: animation, child: child);
                         },
                         child: DetailScreen(
-                          reportNumber: params['reportNumber'] ?? '',
-                          classification: params['classification'] ?? '',
-                          location: params['location'] ?? '',
-                          status: params['status'] ?? '',
-                          date: params['date'] ?? '',
-                          username: params['username'] ?? '',
-                          description: params['description'] ?? '',
-                          extra: imageExtra,
+                          reportNumber: reportNumber,
+                          classification: extra['classification'] ?? '',
+                          location: extra['location'] ?? '',
+                          status: extra['status'] ?? '',
+                          date: extra['date'] ?? '',
+                          username: extra['username'] ?? '',
+                          description: extra['description'] ?? '',
+                          extra: extra,
                         ),
                       );
                     },
@@ -161,7 +163,6 @@ GoRouter createRouter() {
                     ),
                   );
                 },
-                // ✅ Add this nested route for /report/camera
                 routes: [
                   GoRoute(
                     path: Routes.cameraPage, // this is 'camera'
@@ -201,12 +202,14 @@ GoRouter createRouter() {
                     pageBuilder: (context, state) =>
                         const MaterialPage(child: SettingsScreen()),
                   ),
+                  // For profile rating
                   GoRoute(
-                    path: Routes.ratingPage,
+                    path: '/profile/rating/:reportNumber',
                     name: 'profileRating',
                     pageBuilder: (context, state) {
-                      final params = state.uri.queryParameters;
-                      final imageExtra = state.extra as Map<String, dynamic>?;
+                      final reportNumber =
+                          state.pathParameters['reportNumber'] ?? '';
+                      final extra = state.extra as Map<String, dynamic>? ?? {};
 
                       return CustomTransitionPage(
                         transitionDuration: const Duration(milliseconds: 600),
@@ -216,14 +219,15 @@ GoRouter createRouter() {
                               opacity: animation, child: child);
                         },
                         child: RatingScreen(
-                          reportNumber: params['reportNumber'] ?? '',
-                          classification: params['classification'] ?? '',
-                          location: params['location'] ?? '',
-                          status: params['status'] ?? '',
-                          date: params['date'] ?? '',
-                          username: params['username'] ?? '',
-                          description: params['description'] ?? '',
-                          image: imageExtra?['image'] ?? '',
+                          reportNumber: reportNumber,
+                          classification: extra['classification'] ?? '',
+                          location: extra['location'] ?? '',
+                          status: extra['status'] ?? '',
+                          date: extra['date'] ?? '',
+                          username: extra['username'] ?? '',
+                          description: extra['description'] ?? '',
+                          image: extra['image'] ?? '',
+                          extra: extra,
                         ),
                       );
                     },

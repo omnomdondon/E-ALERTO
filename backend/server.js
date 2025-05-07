@@ -271,7 +271,7 @@ app.post('/api/reports', upload.single('image_file'), async (req, res) => {
     }
 });
 
-// ✅ Get All Reports (NEW)
+// ✅ Get All Reports
 app.get('/api/reports', async (req, res) => {
     const authHeader = req.headers.authorization;
     if (!authHeader?.startsWith('Bearer ')) {
@@ -285,13 +285,44 @@ app.get('/api/reports', async (req, res) => {
         const user = await User.findById(decoded.id);
         if (!user) return res.status(404).json({ message: 'User not found' });
 
-        // Fetch all reports, not just the logged-in user's reports
         const reports = await Report.find().sort({ timestamp: -1 });
 
         return res.status(200).json({ success: true, reports });
     } catch (err) {
         console.error('❌ Fetch reports error:', err);
         return res.status(500).json({ success: false, message: 'Failed to fetch reports' });
+    }
+});
+
+// Get Single Report by reportID for HomeDetail
+app.get('/api/reports/:reportID', async (req, res) => {
+    const { reportID } = req.params;  // Use reportID from URL parameter
+
+    try {
+        const report = await Report.findOne({ reportID: reportID }); // Query by reportID
+        if (!report) {
+            return res.status(404).json({ message: 'Report not found' });
+        }
+        return res.status(200).json({ success: true, report });
+    } catch (err) {
+        console.error('❌ Fetch single report error:', err);
+        return res.status(500).json({ success: false, message: 'Failed to fetch report' });
+    }
+});
+
+// Get Report by reportID for Profile Rating
+app.get('/api/reports/rating/:reportID', async (req, res) => {
+    const { reportID } = req.params;  // Use reportID from URL parameter
+
+    try {
+        const report = await Report.findOne({ reportID: reportID }); // Query by reportID
+        if (!report) {
+            return res.status(404).json({ message: 'Report not found' });
+        }
+        return res.status(200).json({ success: true, report });
+    } catch (err) {
+        console.error('❌ Fetch profile rating report error:', err);
+        return res.status(500).json({ success: false, message: 'Failed to fetch report for rating' });
     }
 });
 

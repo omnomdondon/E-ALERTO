@@ -35,8 +35,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (token == null) return;
 
     const baseUrl = String.fromEnvironment('BASE_URL',
-        defaultValue:
-            'http://192.168.100.121:5000/api'); // Add default fallback URL if necessary
+        defaultValue: 'http://192.168.100.121:5000/api');
 
     // Get profile
     final profileRes = await http.get(
@@ -167,6 +166,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ToRateTab(
                   username: username,
                   reports: allReports.where((r) {
+                    // Filter reports based on 'Resolved' status for To Rate tab
                     return r['username'] == username &&
                         r['status'] == 'Resolved';
                   }).toList(),
@@ -225,7 +225,7 @@ class MyReportsTab extends StatelessWidget {
         }
 
         // Skip the report if the username doesn't match
-        return SizedBox.shrink();
+        return const SizedBox.shrink();
       },
     );
   }
@@ -250,7 +250,7 @@ class ToRateTab extends StatelessWidget {
           location: r['location'],
           status: r['status'],
           date: r['timestamp'].toString().split('T')[0],
-          username: '@$username',
+          username: username,
           description: r['description'] ?? '',
           image: r['image_file'] ?? '',
         );

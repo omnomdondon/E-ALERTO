@@ -30,44 +30,6 @@ class SearchScreen extends StatelessWidget {
                   'No search yet'
                 ),
               )
-                
-              /*
-              PostCard(
-                reportNumber: '1',
-                classification: 'Classification',
-                location: 'Location',
-                status: 'Submitted',
-                date: '01/01/2025',
-                username: 'username',
-                description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
-              ),
-              PostCard(
-                reportNumber: '1',
-                classification: 'Classification',
-                location: 'Location',
-                status: 'Accepted',
-                date: '01/01/2025',
-                username: 'username',
-                description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
-              ),
-              PostCard(
-                reportNumber: '1',
-                classification: 'Classification',
-                location: 'Location',
-                status: 'Submitted',
-                date: '01/01/2025',
-                username: 'username',
-                description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
-              ),
-              PostCard(
-                reportNumber: '1',
-                classification: 'Classification',
-                location: 'Location',
-                status: 'Accepted',
-                date: '01/01/2025',
-                username: 'username',
-                description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
-              ), */
             ],
           ),
         ),

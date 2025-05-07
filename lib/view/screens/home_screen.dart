@@ -119,21 +119,29 @@ class _HomeScreenState extends State<HomeScreen> {
                       title: 'Submitted',
                       color: COLOR_SUBMITTED,
                       screen: SubmittedScreen(reports: submitted),
+                      imagePath:
+                          'assets/images/section_boxes_images/submitted.jpg',
                     ),
                     StatusBox(
                       title: 'Accepted',
                       color: COLOR_ACCEPTED,
                       screen: AcceptedScreen(reports: accepted),
+                      imagePath:
+                          'assets/images/section_boxes_images/accepted.jpg',
                     ),
                     StatusBox(
                       title: 'In Progress',
                       color: COLOR_INPROGRESS,
                       screen: InProgressScreen(reports: inProgress),
+                      imagePath:
+                          'assets/images/section_boxes_images/in_progress.jpg',
                     ),
                     StatusBox(
                       title: 'Resolved',
                       color: COLOR_RESOLVED,
                       screen: ResolvedScreen(reports: resolved),
+                      imagePath:
+                          'assets/images/section_boxes_images/resolved.jpg',
                     ),
                   ],
                 ),
