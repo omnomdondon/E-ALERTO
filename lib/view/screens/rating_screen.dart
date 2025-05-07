@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:e_alerto/constants.dart';
 import 'package:e_alerto/view/widgets/custom_filledbutton.dart';
 import 'package:e_alerto/view/widgets/custom_textarea.dart';
@@ -5,7 +6,11 @@ import 'package:e_alerto/view/widgets/post_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:http/http.dart' as http;
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../controller/routes.dart';
 
 class RatingScreen extends StatefulWidget {
   final String reportNumber;
@@ -32,7 +37,8 @@ class RatingScreen extends StatefulWidget {
     this.rate = false,
     this.image,
     this.initialUpVotes = 0,
-    this.initialDownVotes = 0, required Map<String, dynamic> extra,
+    this.initialDownVotes = 0,
+    required Map<String, dynamic> extra,
   });
 
   @override
@@ -44,6 +50,50 @@ class _RatingScreenState extends State<RatingScreen> {
   double overallQuality = 0;
   double serviceQuality = 0;
   double speedQuality = 0;
+
+  // Method to get the auth token from SharedPreferences
+  Future<String?> _getAuthToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs
+        .getString('token'); // Assuming the token is stored under 'token'
+  }
+
+  // Method to submit the rating
+  Future<void> submitRating() async {
+    final token =
+        await _getAuthToken(); // Fetch the token from SharedPreferences or secure storage
+
+    if (token == null) {
+      // Handle error: No token available (user is not logged in)
+      print('User is not logged in');
+      return;
+    }
+
+    final response = await http.post(
+      Uri.parse('http://192.168.100.121:5000/api/submit-rating'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'reportID': widget.reportNumber,
+        'overall': overallQuality.toInt(),
+        'service': serviceQuality.toInt(),
+        'speed': speedQuality.toInt(),
+        'feedback': descriptionController.text,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      // Handle success
+      print('Rating submitted successfully!');
+      // Redirect back to Home Screen after submitting the rating
+      GoRouter.of(context).go(Routes.homePage); // Redirection to home screen
+    } else {
+      // Handle error
+      print('Failed to submit rating: ${response.body}');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +167,7 @@ class _RatingScreenState extends State<RatingScreen> {
                     SizedBox(height: 20.h),
                     CustomFilledButton(
                       text: 'Submit',
-                      onPressed: () => {},
+                      onPressed: submitRating, // Use submitRating here
                       fullWidth: true,
                     ),
                   ],

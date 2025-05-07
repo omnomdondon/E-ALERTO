@@ -59,6 +59,19 @@ const reportSchema = new mongoose.Schema({
 
 const Report = mongoose.model('Report', reportSchema, 'reports');
 
+// --- Rating Schema
+const ratingSchema = new mongoose.Schema({
+    userID: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    report_ID: { type: String, required: true },
+    overall: { type: Number, min: 1, max: 5, required: true },
+    service: { type: Number, min: 1, max: 5, required: true },
+    speed: { type: Number, min: 1, max: 5, required: true },
+    feedback: { type: String, required: true },
+    timestamp: { type: Date, default: Date.now },
+});
+
+const Rating = mongoose.model('Rating', ratingSchema, 'ratings');
+
 // --- Helper
 function generateOTP() {
     return Math.floor(100000 + Math.random() * 900000).toString();
@@ -352,6 +365,45 @@ app.post('/detect', upload.single('image'), async (req, res) => {
     } catch (err) {
         console.error('❌ Image detection error:', err);
         return res.status(500).json({ message: 'Failed to process image' });
+    }
+});
+
+// --- Submit Rating API
+app.post('/api/submit-rating', async (req, res) => {
+    const { reportID, overall, service, speed, feedback } = req.body;
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith('Bearer ')) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    try {
+        const decoded = jwt.verify(token, SECRET_KEY);
+        const user = await User.findById(decoded.id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        // Check if the user has already rated the report
+        const existingRating = await Rating.findOne({ userID: user._id, report_ID: reportID });
+        if (existingRating) {
+            return res.status(400).json({ message: 'You have already rated this report.' });
+        }
+
+        const rating = new Rating({
+            userID: user._id,
+            report_ID: reportID,
+            overall,
+            service,
+            speed,
+            feedback,
+        });
+
+        await rating.save();
+
+        return res.status(201).json({ success: true, message: 'Rating submitted successfully!' });
+    } catch (err) {
+        console.error('❌ Rating submission error:', err);
+        return res.status(500).json({ message: 'Failed to submit rating' });
     }
 });
 
