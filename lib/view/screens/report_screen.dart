@@ -99,7 +99,7 @@ class _ReportScreenState extends State<ReportScreen> {
   }
 
   Future<void> _submitReport() async {
-    final uri = Uri.parse("http://192.168.100.121:3000/api/reports");
+    final uri = Uri.parse("http://192.168.100.121:5000/api/reports");
 
     try {
       final prefs = await SharedPreferences.getInstance();

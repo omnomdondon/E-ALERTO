@@ -29,6 +29,7 @@ dependencies:
   intl: ^0.20.2
   flutter_otp_text_field: ^1.5.1+1
   pinput: ^5.0.1
+  flutter_image_compress: ^2.4.0
 
 dev_dependencies:
   flutter_test:
@@ -43,4 +44,5 @@ flutter:
     - assets/images/image3.png
     - assets/images/logos/E-ALERTO_Logo_Colored.png
     - assets/images/icons/google_icon.png
+    - assets/images/section_boxes_images/
     - backend/.env

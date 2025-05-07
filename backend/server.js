@@ -9,7 +9,7 @@ const multer = require('multer');
 require('dotenv').config({ path: './backend/.env' });
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const SECRET_KEY = process.env.SECRET_KEY;
 
@@ -17,6 +17,11 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 app.use(express.json({ limit: '10mb' }));
 app.use(cors());
+
+// Health check route
+app.get('/', (req, res) => {
+    res.send('Server is running!');
+});
 
 // --- MongoDB Connection
 mongoose.connect(process.env.MONGO_URI, { dbName: 'account' })
@@ -280,12 +285,42 @@ app.get('/api/reports', async (req, res) => {
         const user = await User.findById(decoded.id);
         if (!user) return res.status(404).json({ message: 'User not found' });
 
+        // Fetch all reports, not just the logged-in user's reports
         const reports = await Report.find().sort({ timestamp: -1 });
 
         return res.status(200).json({ success: true, reports });
     } catch (err) {
         console.error('❌ Fetch reports error:', err);
         return res.status(500).json({ success: false, message: 'Failed to fetch reports' });
+    }
+});
+
+// --- Detect Route for Image Processing 
+app.post('/detect', upload.single('image'), async (req, res) => {
+    try {
+        const imageBuffer = req.file?.buffer;
+        if (!imageBuffer) {
+            return res.status(400).json({ message: 'No image file uploaded.' });
+        }
+
+        // Here you would process the image (e.g., object detection)
+        // For now, let's mock the response with dummy detections and image
+        const detections = [
+            { label: 'Object1', confidence: 0.98 },
+            { label: 'Object2', confidence: 0.85 }
+        ];
+
+        // Mock base64 image response (your backend logic will generate the image)
+        const outputImage = imageBuffer.toString('base64');  // Converting image buffer to base64 for the response
+
+        res.status(200).json({
+            detections: detections,
+            image: outputImage
+        });
+
+    } catch (err) {
+        console.error('❌ Image detection error:', err);
+        return res.status(500).json({ message: 'Failed to process image' });
     }
 });
 
