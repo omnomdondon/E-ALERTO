@@ -1,17 +1,23 @@
-import 'package:e_alerto/constants.dart';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+import 'package:timeago/timeago.dart' as timeago;
+
+import '../../constants.dart';
+import 'notification_card.dart';
 
 class PostCard extends StatefulWidget {
   final String reportNumber;
   final String classification;
   final String location;
   final String status;
-  final String date;
+  final String date; // Keep the raw date string
   final String username;
   final String description;
-  final String image; // Still passed for navigation to detail
+  final String image;
   final int initialUpVotes;
   final int initialDownVotes;
   final bool rate;
@@ -22,7 +28,7 @@ class PostCard extends StatefulWidget {
     required this.classification,
     required this.location,
     required this.status,
-    required this.date,
+    required this.date, // This will be passed as the raw timestamp
     required this.username,
     required this.description,
     this.rate = false,
@@ -67,6 +73,19 @@ class _PostCardState extends State<PostCard> {
   Widget build(BuildContext context) {
     final totalVote = upVotes - downVotes;
 
+    // Try parsing the raw date string and handle the exception if it fails
+    DateTime parsedDate;
+    try {
+      // Try parsing using the correct format
+      parsedDate = DateFormat("yyyy-MM-dd")
+          .parse(widget.date); // Match the expected format (e.g., '2025-05-05')
+    } catch (e) {
+      // If the format is incorrect, use the current date as a fallback
+      parsedDate = DateTime.now();
+    }
+
+    final timeAgo = timeago.format(parsedDate); // Convert to relative time
+
     return GestureDetector(
       onTap: () => widget.rate
           ? context.push(
@@ -101,6 +120,17 @@ class _PostCardState extends State<PostCard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Image Preview
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.memory(
+                    base64Decode(widget.image), // Decoding base64 image data
+                    width: double.infinity,
+                    height: 150.h,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                SizedBox(height: 8.h),
                 // Classification and Status
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -168,7 +198,7 @@ class _PostCardState extends State<PostCard> {
                                   color: Colors.blue.shade800),
                             ),
                             TextSpan(
-                              text: ' • ${widget.date}',
+                              text: ' • $timeAgo', // Show the relative time
                               style: TextStyle(
                                   fontSize: 11.sp, color: Colors.grey.shade600),
                             ),
@@ -216,20 +246,5 @@ class _PostCardState extends State<PostCard> {
         ),
       ),
     );
-  }
-}
-
-Color getStatusColor(String status) {
-  switch (status.toLowerCase()) {
-    case 'submitted':
-      return COLOR_SUBMITTED;
-    case 'accepted':
-      return COLOR_ACCEPTED;
-    case 'in progress':
-      return COLOR_INPROGRESS;
-    case 'resolved':
-      return COLOR_RESOLVED;
-    default:
-      return COLOR_DEFAULT;
   }
 }

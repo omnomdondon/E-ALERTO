@@ -1,15 +1,20 @@
 import 'dart:convert';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:e_alerto/constants.dart';
+import 'package:intl/intl.dart'; // For formatting date
+import 'package:timeago/timeago.dart' as timeago;
+
+import '../../constants.dart';
+import '../widgets/notification_card.dart'; // Import the timeago package
 
 class DetailScreen extends StatefulWidget {
   final String reportNumber;
   final String classification;
   final String location;
   final String status;
-  final String date;
+  final String date; // Raw date passed here
   final String username;
   final String description;
   final String image;
@@ -20,7 +25,7 @@ class DetailScreen extends StatefulWidget {
     required this.classification,
     required this.location,
     required this.status,
-    required this.date,
+    required this.date, // Raw date passed here
     required this.username,
     required this.description,
     required Map<String, dynamic>? extra,
@@ -53,7 +58,15 @@ class _DetailScreenState extends State<DetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final decodedImage = base64Decode(widget.image);
+    // Decode the base64 image string passed in `extra`
+    base64Decode(widget.image);
+
+    // Convert the raw date string to DateTime and format it (similar to how it's done in PostCard)
+    final parsedDate = DateFormat("yyyy-MM-dd").parse(widget.date);
+    final timestamp = parsedDate.toLocal(); // Convert to local time
+    final timeAgo = timeago
+        .format(timestamp); // Convert to relative time (e.g., 2 hours ago)
+
     final int totalVote = upVotes - downVotes;
 
     return Scaffold(
@@ -119,11 +132,11 @@ class _DetailScreenState extends State<DetailScreen> {
 
               // Image
               ClipRRect(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(16),
                 child: Image.memory(
-                  decodedImage,
+                  base64Decode(widget.image), // Decoding base64 image data
                   width: double.infinity,
-                  height: 200.h,
+                  height: 150.h,
                   fit: BoxFit.cover,
                 ),
               ),
@@ -151,7 +164,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                 color: Colors.blue.shade800),
                           ),
                           TextSpan(
-                            text: ' • ${widget.date}',
+                            text: ' • $timeAgo', // Display relative time
                             style: TextStyle(
                                 fontSize: 11.sp, color: Colors.grey.shade600),
                           ),
@@ -198,20 +211,5 @@ class _DetailScreenState extends State<DetailScreen> {
         ],
       ),
     );
-  }
-}
-
-Color getStatusColor(String status) {
-  switch (status.toLowerCase()) {
-    case 'submitted':
-      return COLOR_SUBMITTED;
-    case 'accepted':
-      return COLOR_ACCEPTED;
-    case 'in progress':
-      return COLOR_INPROGRESS;
-    case 'resolved':
-      return COLOR_RESOLVED;
-    default:
-      return COLOR_DEFAULT;
   }
 }

@@ -26,10 +26,12 @@ dependencies:
   geolocator: ^10.1.0
   geolocator_android: ^4.1.7
   permission_handler: ^11.0.1
-  intl: ^0.20.2
+  intl: ^0.19.0
   flutter_otp_text_field: ^1.5.1+1
   pinput: ^5.0.1
   flutter_image_compress: ^2.4.0
+  timeago: ^3.2.2
+  cached_network_image: ^3.4.1
 
 dev_dependencies:
   flutter_test:
