@@ -28,7 +28,7 @@ final _shellNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'shell');
 GoRouter createRouter() {
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: Routes.loginPage,
+    initialLocation: Routes.searchPage,
     routes: [
       // Login Screen
       GoRoute(

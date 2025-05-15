@@ -49,14 +49,14 @@ android {
         multiDexEnabled true
     }
 
-    signingConfigs {
+    /*signingConfigs {
         debug {
             keyAlias 'androiddebugkey'
             keyPassword 'e-alerto123'
             storeFile file('mykey.jks')
             storePassword 'e-alerto123'
         }
-    }
+    }*/
 
     buildTypes {
         release {
