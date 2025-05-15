@@ -9,7 +9,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import '../../constant/api.dart';
 import '../../controller/routes.dart';
 
 class RatingScreen extends StatefulWidget {
@@ -70,7 +70,7 @@ class _RatingScreenState extends State<RatingScreen> {
     }
 
     final response = await http.post(
-      Uri.parse('http://192.168.100.121:5000/api/submit-rating'),
+      Uri.parse('$baseUrl/submit-rating'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -97,6 +97,10 @@ class _RatingScreenState extends State<RatingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isGridFsId = widget.image != null &&
+        RegExp(r'^[a-f\d]{24}$').hasMatch(widget.image!);
+    final imageUrl =
+        isGridFsId ? "$baseUrl/image/${widget.image}" : (widget.image ?? '');
     return Scaffold(
       appBar: AppBar(
         title: const Text('Rating'),
@@ -131,7 +135,7 @@ class _RatingScreenState extends State<RatingScreen> {
                 date: widget.date,
                 username: widget.username,
                 description: widget.description,
-                image: widget.image ?? '',
+                image: imageUrl,
               ),
               SizedBox(height: 20.h),
               Form(

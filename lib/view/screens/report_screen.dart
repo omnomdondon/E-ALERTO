@@ -7,7 +7,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:image/image.dart' as img;
+
+import '../../constant/api.dart';
 
 class ReportScreen extends StatefulWidget {
   final String? imagePath;
@@ -31,7 +35,6 @@ class ReportScreen extends StatefulWidget {
 
 class _ReportScreenState extends State<ReportScreen> {
   List<Map<String, dynamic>>? _detections;
-  Uint8List? _outputImage;
   Position? _location;
   String? _address;
   String? _imagePath;
@@ -44,16 +47,20 @@ class _ReportScreenState extends State<ReportScreen> {
   void initState() {
     super.initState();
     _imagePath = widget.imagePath;
-    _isImageValid = _imagePath != null && File(_imagePath!).existsSync();
+    _isImageValid = _imagePath != null;
+
+    final isGridFsId =
+        _imagePath != null && RegExp(r'^[a-f\d]{24}$').hasMatch(_imagePath!);
+
+    if (_imagePath != null && !isGridFsId && File(_imagePath!).existsSync()) {
+      print("📸 Local Image File: ${File(_imagePath!).uri.pathSegments.last}");
+    } else if (isGridFsId) {
+      print("📦 Detected GridFS Image ID: $_imagePath");
+    }
+
     _detections = widget.detections;
-    _outputImage = widget.outputImage;
     _location = widget.location;
     _address = widget.address;
-
-    if (_imagePath != null) {
-      final imageFileName = File(_imagePath!).uri.pathSegments.last;
-      print("📸 Image File: $imageFileName");
-    }
 
     if (_detections != null && _detections!.isNotEmpty) {
       for (final detection in _detections!) {
@@ -70,6 +77,37 @@ class _ReportScreenState extends State<ReportScreen> {
       print("🌐 Coordinates: ${_location!.latitude}, ${_location!.longitude}");
     }
   }
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _imagePath = widget.imagePath;
+  //   _isImageValid = _imagePath != null;
+  //   (_imagePath!.startsWith('http') || File(_imagePath!).existsSync());
+  //   _detections = widget.detections;
+  //   _location = widget.location;
+  //   _address = widget.address;
+
+  //   if (_imagePath != null) {
+  //     final imageFileName = File(_imagePath!).uri.pathSegments.last;
+  //     print("📸 Image File: $imageFileName");
+  //   }
+
+  //   if (_detections != null && _detections!.isNotEmpty) {
+  //     for (final detection in _detections!) {
+  //       final label = detection['label'];
+  //       final confidence = detection['confidence'];
+  //       print(
+  //           "🏷️ Label: $label | Confidence: ${(confidence * 100).toStringAsFixed(2)}%");
+  //     }
+  //   }
+
+  //   if (_address != null) {
+  //     print("📍 Address: $_address");
+  //   } else if (_location != null) {
+  //     print("🌐 Coordinates: ${_location!.latitude}, ${_location!.longitude}");
+  //   }
+  // }
 
   @override
   void dispose() {
@@ -99,7 +137,7 @@ class _ReportScreenState extends State<ReportScreen> {
   }
 
   Future<void> _submitReport() async {
-    final uri = Uri.parse("http://192.168.100.121:5000/api/reports");
+    final uri = Uri.parse("$baseUrl/reports");
 
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -118,8 +156,57 @@ class _ReportScreenState extends State<ReportScreen> {
       request.headers['Authorization'] = 'Bearer $token';
 
       if (_imagePath != null) {
-        request.files
-            .add(await http.MultipartFile.fromPath('image_file', _imagePath!));
+        if (_imagePath!.startsWith('http')) {
+          // Download the image from the URL
+          final response = await http.get(Uri.parse(_imagePath!));
+          final decodedImage = img.decodeImage(response.bodyBytes);
+          if (decodedImage == null) {
+            print('❌ Could not decode image from URL');
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Invalid image format')),
+            );
+            return;
+          }
+          final jpegBytes = img.encodeJpg(decodedImage);
+          request.files.add(http.MultipartFile.fromBytes(
+            'image_file',
+            jpegBytes,
+            filename: 'image.jpg',
+            contentType: MediaType('image', 'jpeg'),
+          ));
+        } else {
+          final isGridFsId = RegExp(r'^[a-f\d]{24}$').hasMatch(_imagePath!);
+          if (isGridFsId) {
+            print("✅ Skipping file read. GridFS image ID: $_imagePath");
+            request.fields['image_file'] = _imagePath!;
+          } else {
+            final file = File(_imagePath!);
+            if (!await file.exists()) {
+              print('❌ File does not exist: $_imagePath');
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Image file not found')),
+              );
+              return;
+            }
+
+            final rawBytes = await file.readAsBytes();
+            final decodedImage = img.decodeImage(rawBytes);
+            if (decodedImage == null) {
+              print('❌ Could not decode local image');
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Invalid image format')),
+              );
+              return;
+            }
+            final jpegBytes = img.encodeJpg(decodedImage);
+            request.files.add(http.MultipartFile.fromBytes(
+              'image_file',
+              jpegBytes,
+              filename: 'image.jpg',
+              contentType: MediaType('image', 'jpeg'),
+            ));
+          }
+        }
       }
 
       request.fields['classification'] =
@@ -252,25 +339,47 @@ class _ReportScreenState extends State<ReportScreen> {
   }
 
   Widget _buildImageWidget() {
-    if (_outputImage != null) {
-      return Image.memory(
-        _outputImage!,
-        key: const ValueKey('processedImage'),
-        width: double.infinity,
-        height: MediaQuery.of(context).size.height * 0.3,
-        fit: BoxFit.cover,
-      );
+    if (_imagePath != null) {
+      final isGridFsId = RegExp(r'^[a-f\d]{24}$').hasMatch(_imagePath!);
+
+      if (isGridFsId) {
+        final imageUrl = "$baseUrl/image/${_imagePath!}";
+        print("🖼️ Image preview URL (GridFS): $imageUrl");
+
+        return Image.network(
+          imageUrl,
+          key: ValueKey(imageUrl),
+          width: double.infinity,
+          height: MediaQuery.of(context).size.height * 0.3,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => _buildErrorWidget(),
+        );
+      }
+
+      print("⚠️ Not a valid GridFS ID, skipping preview.");
     }
-    return _imagePath != null
-        ? Image.file(
-            File(_imagePath!),
-            key: ValueKey(_imagePath),
-            width: double.infinity,
-            height: MediaQuery.of(context).size.height * 0.3,
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => _buildErrorWidget(),
-          )
-        : const SizedBox();
+
+    // if (_imagePath != null) {
+    //   final isGridFsId = RegExp(r'^[a-f\d]{24}$').hasMatch(_imagePath!);
+
+    //   if (isGridFsId) {
+    //     final imageUrl = "$baseUrl/image/${_imagePath!}";
+    //     print("🖼️ Image preview URL (GridFS): $imageUrl");
+
+    //     return Image.network(
+    //       imageUrl,
+    //       key: ValueKey(imageUrl),
+    //       width: double.infinity,
+    //       height: MediaQuery.of(context).size.height * 0.3,
+    //       fit: BoxFit.cover,
+    //       errorBuilder: (_, __, ___) => _buildErrorWidget(),
+    //     );
+    //   }
+
+    //   print("⚠️ Not a valid GridFS ID, skipping preview.");
+    // }
+
+    return _buildErrorWidget();
   }
 
   Widget _buildErrorWidget() {
