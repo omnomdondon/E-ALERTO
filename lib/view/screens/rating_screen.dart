@@ -10,7 +10,6 @@ import 'package:http/http.dart' as http;
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../constant/api.dart';
-import '../../controller/routes.dart';
 
 class RatingScreen extends StatefulWidget {
   final String reportNumber;
