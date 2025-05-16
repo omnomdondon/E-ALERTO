@@ -60,12 +60,25 @@ class _RatingScreenState extends State<RatingScreen> {
 
   // Method to submit the rating
   Future<void> submitRating() async {
-    final token =
-        await _getAuthToken(); // Fetch the token from SharedPreferences or secure storage
-
+    final token = await _getAuthToken();
     if (token == null) {
-      // Handle error: No token available (user is not logged in)
-      print('User is not logged in');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please log in to submit your rating.')),
+      );
+      return;
+    }
+
+    if (overallQuality < 1 || serviceQuality < 1 || speedQuality < 1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please complete all rating fields.')),
+      );
+      return;
+    }
+
+    if (descriptionController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Feedback cannot be empty.')),
+      );
       return;
     }
 
@@ -80,18 +93,21 @@ class _RatingScreenState extends State<RatingScreen> {
         'overall': overallQuality.toInt(),
         'service': serviceQuality.toInt(),
         'speed': speedQuality.toInt(),
-        'feedback': descriptionController.text,
+        'feedback': descriptionController.text.trim(),
       }),
     );
 
     if (response.statusCode == 201) {
-      // Handle success
-      print('Rating submitted successfully!');
-      // Redirect back to Home Screen after submitting the rating
-      GoRouter.of(context).go(Routes.homePage); // Redirection to home screen
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Thank you for your feedback!')),
+      );
+
+      // ✅ Force refresh by popping to root and going home
+      context.goNamed('home'); // Ensures full rebuild of HomeScreen
     } else {
-      // Handle error
-      print('Failed to submit rating: ${response.body}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to submit rating: ${response.body}')),
+      );
     }
   }
 

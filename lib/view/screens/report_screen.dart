@@ -33,6 +33,8 @@ class ReportScreen extends StatefulWidget {
   State<ReportScreen> createState() => _ReportScreenState();
 }
 
+bool _isSubmitting = false;
+
 class _ReportScreenState extends State<ReportScreen> {
   List<Map<String, dynamic>>? _detections;
   Position? _location;
@@ -78,37 +80,6 @@ class _ReportScreenState extends State<ReportScreen> {
     }
   }
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _imagePath = widget.imagePath;
-  //   _isImageValid = _imagePath != null;
-  //   (_imagePath!.startsWith('http') || File(_imagePath!).existsSync());
-  //   _detections = widget.detections;
-  //   _location = widget.location;
-  //   _address = widget.address;
-
-  //   if (_imagePath != null) {
-  //     final imageFileName = File(_imagePath!).uri.pathSegments.last;
-  //     print("📸 Image File: $imageFileName");
-  //   }
-
-  //   if (_detections != null && _detections!.isNotEmpty) {
-  //     for (final detection in _detections!) {
-  //       final label = detection['label'];
-  //       final confidence = detection['confidence'];
-  //       print(
-  //           "🏷️ Label: $label | Confidence: ${(confidence * 100).toStringAsFixed(2)}%");
-  //     }
-  //   }
-
-  //   if (_address != null) {
-  //     print("📍 Address: $_address");
-  //   } else if (_location != null) {
-  //     print("🌐 Coordinates: ${_location!.latitude}, ${_location!.longitude}");
-  //   }
-  // }
-
   @override
   void dispose() {
     descriptionController.dispose();
@@ -137,14 +108,50 @@ class _ReportScreenState extends State<ReportScreen> {
   }
 
   Future<void> _submitReport() async {
-    final uri = Uri.parse("$baseUrl/reports");
+    // 🔐 Validate image again
+    if (!_isImageValid || _imagePath == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Please capture an image before submitting.')),
+      );
+      return;
+    }
 
+    // 🚫 Ensure detection results exist
+    if (_detections == null ||
+        _detections!.isEmpty ||
+        _detections![0]['label'] == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No valid detection found.')),
+      );
+      return;
+    }
+
+    // 📍 Validate location
+    if (_address == null && _location == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content:
+                Text('Location is required. Please allow location access.')),
+      );
+      return;
+    }
+
+    // ✍️ Validate description
+    if (descriptionController.text.trim().isEmpty) {
+      FocusScope.of(context).requestFocus(descriptionFocusNode);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Description cannot be empty.')),
+      );
+      return;
+    }
+
+    final uri = Uri.parse("$baseUrl/reports");
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
       if (token == null) {
-        print("🚫 No auth token found.");
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
               content: Text('You must be logged in to submit a report.')),
@@ -155,83 +162,75 @@ class _ReportScreenState extends State<ReportScreen> {
       final request = http.MultipartRequest('POST', uri);
       request.headers['Authorization'] = 'Bearer $token';
 
-      if (_imagePath != null) {
-        if (_imagePath!.startsWith('http')) {
-          // Download the image from the URL
-          final response = await http.get(Uri.parse(_imagePath!));
-          final decodedImage = img.decodeImage(response.bodyBytes);
-          if (decodedImage == null) {
-            print('❌ Could not decode image from URL');
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Invalid image format')),
-            );
-            return;
-          }
-          final jpegBytes = img.encodeJpg(decodedImage);
-          request.files.add(http.MultipartFile.fromBytes(
-            'image_file',
-            jpegBytes,
-            filename: 'image.jpg',
-            contentType: MediaType('image', 'jpeg'),
-          ));
-        } else {
-          final isGridFsId = RegExp(r'^[a-f\d]{24}$').hasMatch(_imagePath!);
-          if (isGridFsId) {
-            print("✅ Skipping file read. GridFS image ID: $_imagePath");
-            request.fields['image_file'] = _imagePath!;
-          } else {
-            final file = File(_imagePath!);
-            if (!await file.exists()) {
-              print('❌ File does not exist: $_imagePath');
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Image file not found')),
-              );
-              return;
-            }
-
-            final rawBytes = await file.readAsBytes();
-            final decodedImage = img.decodeImage(rawBytes);
-            if (decodedImage == null) {
-              print('❌ Could not decode local image');
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Invalid image format')),
-              );
-              return;
-            }
-            final jpegBytes = img.encodeJpg(decodedImage);
-            request.files.add(http.MultipartFile.fromBytes(
-              'image_file',
-              jpegBytes,
-              filename: 'image.jpg',
-              contentType: MediaType('image', 'jpeg'),
-            ));
-          }
+      // 🖼️ Image handling stays the same...
+      if (_imagePath!.startsWith('http')) {
+        final response = await http.get(Uri.parse(_imagePath!));
+        final decodedImage = img.decodeImage(response.bodyBytes);
+        if (decodedImage == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Invalid image format')),
+          );
+          return;
         }
+        final jpegBytes = img.encodeJpg(decodedImage);
+        request.files.add(http.MultipartFile.fromBytes(
+          'image_file',
+          jpegBytes,
+          filename: 'image.jpg',
+          contentType: MediaType('image', 'jpeg'),
+        ));
+      } else if (RegExp(r'^[a-f\d]{24}$').hasMatch(_imagePath!)) {
+        request.fields['image_file'] = _imagePath!;
+      } else {
+        final file = File(_imagePath!);
+        if (!await file.exists()) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Image file not found')),
+          );
+          return;
+        }
+
+        final rawBytes = await file.readAsBytes();
+        final decodedImage = img.decodeImage(rawBytes);
+        if (decodedImage == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Invalid image format')),
+          );
+          return;
+        }
+
+        final jpegBytes = img.encodeJpg(decodedImage);
+        request.files.add(http.MultipartFile.fromBytes(
+          'image_file',
+          jpegBytes,
+          filename: 'image.jpg',
+          contentType: MediaType('image', 'jpeg'),
+        ));
       }
 
-      request.fields['classification'] =
-          _detections != null && _detections!.isNotEmpty
-              ? _detections![0]['label']
-              : 'Unknown';
-      request.fields['measurement'] = 'No measurements'; // Placeholder
-      request.fields['location'] = _address ??
-          (_location != null
-              ? "${_location!.latitude}, ${_location!.longitude}"
-              : "Unknown");
+      // 📤 Fill out remaining fields
+      request.fields['classification'] = _detections![0]['label'];
+      request.fields['measurement'] = 'No measurements';
+      request.fields['location'] =
+          _address ?? "${_location!.latitude}, ${_location!.longitude}";
       request.fields['timestamp'] = DateTime.now().toIso8601String();
-      request.fields['description'] = descriptionController.text;
+      request.fields['description'] = descriptionController.text.trim();
 
       final response = await request.send();
 
       if (response.statusCode == 201) {
         if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Report submitted successfully!')),
+        );
         context.go(Routes.homePage);
       } else {
         final responseBody = await response.stream.bytesToString();
         print('❌ Failed to submit: ${response.reasonPhrase}');
         print(responseBody);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to submit report')),
+          const SnackBar(
+              content: Text('Failed to submit report. Please try again.')),
         );
       }
     } catch (e) {
@@ -318,7 +317,9 @@ class _ReportScreenState extends State<ReportScreen> {
               SizedBox(height: 20.h),
               CustomFilledButton(
                 text: 'Submit',
-                onPressed: () {
+                onPressed: () async {
+                  if (_isSubmitting) return;
+
                   if (!_isImageValid) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -326,7 +327,10 @@ class _ReportScreenState extends State<ReportScreen> {
                     );
                     return;
                   }
-                  _submitReport();
+
+                  setState(() => _isSubmitting = true);
+                  await _submitReport();
+                  if (mounted) setState(() => _isSubmitting = false);
                 },
                 fullWidth: true,
               ),
@@ -358,26 +362,6 @@ class _ReportScreenState extends State<ReportScreen> {
 
       print("⚠️ Not a valid GridFS ID, skipping preview.");
     }
-
-    // if (_imagePath != null) {
-    //   final isGridFsId = RegExp(r'^[a-f\d]{24}$').hasMatch(_imagePath!);
-
-    //   if (isGridFsId) {
-    //     final imageUrl = "$baseUrl/image/${_imagePath!}";
-    //     print("🖼️ Image preview URL (GridFS): $imageUrl");
-
-    //     return Image.network(
-    //       imageUrl,
-    //       key: ValueKey(imageUrl),
-    //       width: double.infinity,
-    //       height: MediaQuery.of(context).size.height * 0.3,
-    //       fit: BoxFit.cover,
-    //       errorBuilder: (_, __, ___) => _buildErrorWidget(),
-    //     );
-    //   }
-
-    //   print("⚠️ Not a valid GridFS ID, skipping preview.");
-    // }
 
     return _buildErrorWidget();
   }

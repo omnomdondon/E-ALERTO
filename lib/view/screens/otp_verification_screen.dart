@@ -111,16 +111,16 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
   @override
   Widget build(BuildContext context) {
     final defaultPinTheme = PinTheme(
-      width: 50.w,
-      height: 60.h,
+      width: 48.w,
+      height: 44.h, // 🧼 shorter height
       textStyle: TextStyle(
-        fontSize: 20.sp,
+        fontSize: 18.sp,
         fontWeight: FontWeight.bold,
         color: Colors.black87,
       ),
       decoration: BoxDecoration(
         color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(10.r),
         border: Border.all(color: Colors.grey.shade300),
       ),
     );

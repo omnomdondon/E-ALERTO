@@ -156,8 +156,16 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   label: 'Full Name',
                   hintText: 'Enter Full Name',
                   controller: _fullNameController,
-                  validator: (value) => _inputController.validator(
-                      value ?? '', "Full name is required"),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return "Full name is required";
+                    }
+                    final nameRegex = RegExp(r"^[a-zA-Z\s]+$");
+                    if (!nameRegex.hasMatch(value.trim())) {
+                      return "Only letters and spaces are allowed";
+                    }
+                    return null;
+                  },
                 ),
                 SizedBox(height: 15.h),
                 CustomTextFormField(
@@ -191,25 +199,41 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   onFocusChange: (hasFocus) {
                     if (hasFocus) setState(() => _passwordError = null);
                   },
-                  child: CustomTextFormField(
-                    label: 'Password',
-                    hintText: 'Enter Password',
-                    controller: _passwordController,
-                    obscureText: _obscurePassword,
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                        color: Colors.grey,
-                      ),
-                      onPressed: () =>
-                          setState(() => _obscurePassword = !_obscurePassword),
-                    ),
-                    validator: (value) {
-                      if (_passwordError != null) return _passwordError;
-                      return _inputController.passwordValidator(value ?? '');
+                  child: Listener(
+                    onPointerDown: (_) {
+                      Clipboard.getData('text/plain').then((clipboardContent) {
+                        if (clipboardContent != null &&
+                            clipboardContent.text != null &&
+                            clipboardContent.text!.isNotEmpty) {
+                          _handlePaste(context, "password");
+                        }
+                      });
                     },
+                    child: CustomTextFormField(
+                      label: 'Password',
+                      hintText: 'Enter Password',
+                      controller: _passwordController,
+                      obscureText: _obscurePassword,
+                      enableInteractiveSelection: false,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.deny(
+                            RegExp(r'.{100,}')), // optional safeguard
+                      ],
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: Colors.grey,
+                        ),
+                        onPressed: () => setState(
+                            () => _obscurePassword = !_obscurePassword),
+                      ),
+                      validator: (value) {
+                        if (_passwordError != null) return _passwordError;
+                        return _inputController.passwordValidator(value ?? '');
+                      },
+                    ),
                   ),
                 ),
                 SizedBox(height: 15.h),
@@ -217,28 +241,43 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   onFocusChange: (hasFocus) {
                     if (hasFocus) setState(() => _confirmPasswordError = null);
                   },
-                  child: CustomTextFormField(
-                    label: 'Confirm Password',
-                    hintText: 'Confirm Password',
-                    controller: _confirmPasswordController,
-                    obscureText: _obscureConfirmPassword,
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscureConfirmPassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                        color: Colors.grey,
-                      ),
-                      onPressed: () => setState(() =>
-                          _obscureConfirmPassword = !_obscureConfirmPassword),
-                    ),
-                    validator: (value) {
-                      if (_confirmPasswordError != null) {
-                        return _confirmPasswordError;
-                      }
-                      return _inputController.confirmPass(
-                          value ?? '', _passwordController.text);
+                  child: Listener(
+                    onPointerDown: (_) {
+                      Clipboard.getData('text/plain').then((clipboardContent) {
+                        if (clipboardContent != null &&
+                            clipboardContent.text != null &&
+                            clipboardContent.text!.isNotEmpty) {
+                          _handlePaste(context, "confirm");
+                        }
+                      });
                     },
+                    child: CustomTextFormField(
+                      label: 'Confirm Password',
+                      hintText: 'Confirm Password',
+                      controller: _confirmPasswordController,
+                      obscureText: _obscureConfirmPassword,
+                      enableInteractiveSelection: false,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.deny(RegExp(r'.{100,}')),
+                      ],
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureConfirmPassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: Colors.grey,
+                        ),
+                        onPressed: () => setState(() =>
+                            _obscureConfirmPassword = !_obscureConfirmPassword),
+                      ),
+                      validator: (value) {
+                        if (_confirmPasswordError != null) {
+                          return _confirmPasswordError;
+                        }
+                        return _inputController.confirmPass(
+                            value ?? '', _passwordController.text);
+                      },
+                    ),
                   ),
                 ),
                 SizedBox(height: 25.h),

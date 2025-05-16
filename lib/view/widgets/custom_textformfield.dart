@@ -15,7 +15,8 @@ class CustomTextFormField extends StatefulWidget {
     this.suffixIcon,
     this.obscureText = false,
     this.hintText = '',
-    this.focusNode,
+    this.focusNode, 
+    this.enableInteractiveSelection = true,
   });
 
   final String label;
@@ -28,6 +29,7 @@ class CustomTextFormField extends StatefulWidget {
   final bool obscureText;
   final String hintText;
   final FocusNode? focusNode;
+  final bool enableInteractiveSelection;
 
   @override
   _CustomTextFormFieldState createState() => _CustomTextFormFieldState();
@@ -74,6 +76,19 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
               color: Colors.red.shade900, width: ScreenUtil().setSp(2)),
         ),
       ),
+      enableInteractiveSelection: widget.enableInteractiveSelection,
+
+      buildCounter:
+          (_, {required currentLength, maxLength, required isFocused}) => null,
+      onTap: () {
+        // Optional: log tap events
+      },
+      onFieldSubmitted: (_) {
+        // Optional: trigger validation
+      },
+      onEditingComplete: () {
+        // Optional: handle input end
+      },
     );
   }
 }

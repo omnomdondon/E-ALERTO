@@ -77,7 +77,8 @@ class _CameraScreenState extends State<CameraScreen> {
   }
 
   Future<void> _sendToBackend(File image) async {
-    final uri = Uri.parse('http://192.168.172.89:5000/detect');
+    // final uri = Uri.parse('http://192.168.172.89:5000/detect');
+    final uri = Uri.parse('http://192.168.1.17:5000/detect');
     var request = http.MultipartRequest('POST', uri);
 
     if (await image.exists()) {
